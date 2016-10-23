@@ -1,0 +1,18 @@
+.row {
+  clear: left;
+}
+
+.cell {
+  float: left;
+  width: 40px;
+  height: 40px;
+  background: #eee;
+  text-align: center;
+  margin: .2em;
+  line-height: 1em;
+  overflow:  hide;
+}
+
+.cell.active {
+  background: pink;
+}
