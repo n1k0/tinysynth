@@ -3,6 +3,7 @@
 export type Track = {
   name: string,
   sample: string,
+  vol: number,
   beats: boolean[],
 };
 

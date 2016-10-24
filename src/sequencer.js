@@ -4,7 +4,12 @@ import type { Track, ToneLoop } from "./types";
 import Tone from "tone";
 
 
-const velocities = [1, .5, .75, .5, 1, .5, .75, .5, 1, .5, .75, .5, 1, .5, .75, .5];
+const velocities = [
+  1, .5, .75, .5,
+  1, .5, .75, .5,
+  1, .5, .75, .5,
+  1, .5, .75, .5,
+];
 
 export function create(tracks: Track[]): ToneLoop {
   const loop = new Tone.Sequence(
@@ -29,16 +34,12 @@ function loopProcessor(tracks) {
     return {...acc, [track.name]: track.sample};
   }, {});
 
-  const keys = new Tone.MultiPlayer({
-    urls,
-    // volume : 1,
-    // fadeOut : 0.1,
-  }).toMaster();
+  const keys = new Tone.MultiPlayer({urls}).toMaster();
 
   return (time, index) => {
-    tracks.forEach(({name, beats}) => {
+    tracks.forEach(({name, vol, beats}) => {
       if (beats[index]) {
-        keys.start(name, time, 0, "1n", 0, velocities[index]);
+        keys.start(name, time, 0, "1n", 0, velocities[index] * vol);
       }
     });
   };

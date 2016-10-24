@@ -10,10 +10,10 @@ import * as sequencer from "./sequencer";
 
 function initTracks(): Track[] {
   return [
-    {name: "hi-hat (open)", sample: "audio/hihato.wav", beats: initBeats(16)},
-    {name: "hi-hat (close)", sample: "audio/hihatc.wav", beats: initBeats(16)},
-    {name: "snare", sample: "audio/snare.wav", beats: initBeats(16)},
-    {name: "kick", sample: "audio/kick.wav", beats: initBeats(16)},
+    {name: "hi-hat (open)", sample: "audio/hihato.wav", vol: .8, beats: initBeats(16)},
+    {name: "hi-hat (close)", sample: "audio/hihatc.wav", vol: .8, beats: initBeats(16)},
+    {name: "snare", sample: "audio/snare.wav", vol: 1, beats: initBeats(16)},
+    {name: "kick", sample: "audio/kick.wav", vol: 1, beats: initBeats(16)},
   ];
 }
 
@@ -21,7 +21,7 @@ function initBeats(n) {
   return new Array(n).fill(false);
 }
 
-function updateTracks(tracks, name, beat) {
+function _toggleTrackBeat(tracks, name, beat) {
   return tracks.map((track: Track) => {
     if (track.name !== name) {
       return track;
@@ -34,19 +34,33 @@ function updateTracks(tracks, name, beat) {
   });
 }
 
-function TrackView({track, update}: {
+function _setTrackVolume(tracks, name, vol) {
+  return tracks.map((track: Track) => {
+    if (track.name !== name) {
+      return track;
+    } else {
+      return {...track, vol};
+    }
+  });
+}
+
+function TrackView({track, toggleTrackBeat, setTrackVolume}: {
   track: Track,
-  update: (name: string, beat: number) => void
+  toggleTrackBeat: (name: string, beat: number) => void,
+  setTrackVolume: (name: string, vol: number) => void
 }) {
   return (
     <tr className="track">
       <td>{track.name}</td>
+      <td>
+        <input type="range" min="0" max="1" step=".1" value={track.vol}
+          onChange={event => setTrackVolume(track.name, parseFloat(event.target.value))} /></td>
       {
         track.beats.map((v, beat) => (
           <td key={beat} className={`beat ${v ? "active" : ""}`}>
             <a href="" onClick={(event) => {
               event.preventDefault();
-              update(track.name, beat);
+              toggleTrackBeat(track.name, beat);
             }} />
           </td>
         ))
@@ -55,14 +69,19 @@ function TrackView({track, update}: {
   );
 }
 
-function TrackListView({tracks, update}) {
+function TrackListView({tracks, toggleTrackBeat, setTrackVolume}) {
   return (
     <div>
       <h3>tinysynth</h3>
       <table>
         <tbody>{
           tracks.map((track, i) => {
-            return <TrackView key={i} track={track} update={update} />;
+            return (
+              <TrackView key={i}
+                track={track}
+                toggleTrackBeat={toggleTrackBeat}
+                setTrackVolume={setTrackVolume} />
+              );
           })
         }</tbody>
       </table>
@@ -90,9 +109,18 @@ class App extends Component {
     this.state.loop.stop();
   };
 
-  update = (name: string, beat: number) => {
+  toggleTrackBeat = (name: string, beat: number) => {
     const {tracks, loop} = this.state;
-    const newTracks = updateTracks(tracks, name, beat);
+    const newTracks = _toggleTrackBeat(tracks, name, beat);
+    this.setState({
+      tracks: newTracks,
+      loop: sequencer.update(loop, newTracks),
+    });
+  };
+
+  setTrackVolume = (name: string, vol: number) => {
+    const {tracks, loop} = this.state;
+    const newTracks = _setTrackVolume(tracks, name, vol);
     this.setState({
       tracks: newTracks,
       loop: sequencer.update(loop, newTracks),
@@ -103,7 +131,10 @@ class App extends Component {
     const {tracks} = this.state;
     return (
       <div>
-        <TrackListView tracks={tracks} update={this.update} />
+        <TrackListView
+          tracks={tracks}
+          toggleTrackBeat={this.toggleTrackBeat}
+          setTrackVolume={this.setTrackVolume} />
         <button onClick={this.start}>start</button>
         <button onClick={this.stop}>stop</button>
       </div>

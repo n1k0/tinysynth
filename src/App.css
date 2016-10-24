@@ -9,10 +9,10 @@
   background: pink;
 }
 
-.beat:nth-of-type(2),
-.beat:nth-of-type(6),
-.beat:nth-of-type(10),
-.beat:nth-of-type(14) {
+.beat:nth-of-type(3),
+.beat:nth-of-type(7),
+.beat:nth-of-type(11),
+.beat:nth-of-type(15) {
   border-left: 4px solid lightblue;
 }
 
