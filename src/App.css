@@ -1,18 +1,23 @@
-.track {
-  clear: left;
-}
-
 .beat {
-  float: left;
-  width: 40px;
-  height: 40px;
   background: #eee;
   text-align: center;
-  margin: .2em;
   line-height: 1em;
-  overflow:  hide;
+  border-radius: 2px;
 }
 
 .beat.active {
   background: pink;
+}
+
+.beat:nth-of-type(2),
+.beat:nth-of-type(6),
+.beat:nth-of-type(10),
+.beat:nth-of-type(14) {
+  border-left: 4px solid lightblue;
+}
+
+.beat > a {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
 }

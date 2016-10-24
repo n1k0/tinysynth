@@ -6,32 +6,42 @@ import './App.css';
 
 type Track = {name: string, sample: string, beats: boolean[]};
 
-function prevent(fn) {
-  return event => {
-    event.preventDefault();
-    fn();
-  }
+function initBeats(n) {
+  return new Array(n).fill(false);
 }
 
 function TrackView({track, update}: {
   track: Track,
   update: (name: string, beat: number) => void
 }) {
-  return <div className="track">{
-    track.beats.map((v, beat) => (
-      <a key={beat} href="" className={`beat ${v ? "active" : ""}`}
-         onClick={prevent(() => update(track.name, beat))} />
-    ))
-  }</div>;
+  return (
+    <tr className="track">
+      <td>{track.name}</td>
+      {
+        track.beats.map((v, beat) => (
+          <td key={beat} className={`beat ${v ? "active" : ""}`}>
+            <a href="" onClick={(event) => {
+              event.preventDefault();
+              update(track.name, beat);
+            }} />
+          </td>
+        ))
+      }
+    </tr>
+  );
 }
 
 function TrackListView({tracks, update}) {
   return (
     <div>
       <h3>Let's there be rock</h3>
-      <div>{
-        tracks.map((track, i) => <TrackView key={i} track={track} update={update} />)
-      }</div>
+      <table>
+        <tbody>{
+          tracks.map((track, i) => {
+            return <TrackView key={i} track={track} update={update} />;
+          })
+        }</tbody>
+      </table>
     </div>
   );
 }
@@ -47,8 +57,9 @@ class App extends Component {
 
   static defaultProps = {
     tracks: [
-      {name: "snare", sample: "snare.ogg", beats: new Array(12).fill(false)},
-      {name: "kick", sample: "kick.ogg", beats: new Array(12).fill(false)},
+      {name: "hi-hat", sample: "hihat.ogg", beats: initBeats(16)},
+      {name: "snare", sample: "snare.ogg", beats: initBeats(16)},
+      {name: "kick", sample: "kick.ogg", beats: initBeats(16)},
     ]
   };
 
