@@ -6,6 +6,14 @@ import './App.css';
 
 type Track = {name: string, sample: string, beats: boolean[]};
 
+function initTracks(): Track[] {
+  return [
+    {name: "hi-hat", sample: "hihat.ogg", beats: initBeats(16)},
+    {name: "snare", sample: "snare.ogg", beats: initBeats(16)},
+    {name: "kick", sample: "kick.ogg", beats: initBeats(16)},
+  ];
+}
+
 function initBeats(n) {
   return new Array(n).fill(false);
 }
@@ -34,7 +42,7 @@ function TrackView({track, update}: {
 function TrackListView({tracks, update}) {
   return (
     <div>
-      <h3>Let's there be rock</h3>
+      <h3>tinysynth</h3>
       <table>
         <tbody>{
           tracks.map((track, i) => {
@@ -47,26 +55,13 @@ function TrackListView({tracks, update}) {
 }
 
 class App extends Component {
-  props: {
-    tracks: Track[],
-  };
-
   state: {
     tracks: Track[],
   };
 
-  static defaultProps = {
-    tracks: [
-      {name: "hi-hat", sample: "hihat.ogg", beats: initBeats(16)},
-      {name: "snare", sample: "snare.ogg", beats: initBeats(16)},
-      {name: "kick", sample: "kick.ogg", beats: initBeats(16)},
-    ]
-  };
-
-  constructor(props: Object) {
+  constructor(props: {}) {
     super(props);
-    const {tracks} = props;
-    this.state = {tracks};
+    this.state = {tracks: initTracks()};
   }
 
   update = (name: string, beat: number) => {
