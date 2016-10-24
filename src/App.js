@@ -4,46 +4,71 @@ import React, { Component } from 'react';
 import './App.css';
 
 
-type Matrix = Array<number[]>;
+type Track = {name: string, sample: string, beats: boolean[]};
 
-function initMatrix(w, h): Matrix {
-  return new Array(h).fill(0).map(_ => new Array(w).fill(0));
+function prevent(fn) {
+  return event => {
+    event.preventDefault();
+    fn();
+  }
 }
 
-function Cell({x, y, v, update}: {
-  x: number,
-  y: number,
-  v: number,
-  update: (x: number, y: number, v: number) => void
+function TrackView({track, update}: {
+  track: Track,
+  update: (name: string, beat: number) => void
 }) {
-  return <a href="" className={`cell ${v === 1 ? "active" : ""}`}
-            onClick={e => e.preventDefault() || update(x, y, v)} />;
+  return <div className="track">{
+    track.beats.map((v, beat) => (
+      <a key={beat} href="" className={`beat ${v ? "active" : ""}`}
+         onClick={prevent(() => update(track.name, beat))} />
+    ))
+  }</div>;
+}
+
+function TrackListView({tracks, update}) {
+  return (
+    <div>
+      <h3>Let's there be rock</h3>
+      <div>{
+        tracks.map((track, i) => <TrackView key={i} track={track} update={update} />)
+      }</div>
+    </div>
+  );
 }
 
 class App extends Component {
+  props: {
+    tracks: Track[],
+  };
+
   state: {
-    cells: Matrix
+    tracks: Track[],
+  };
+
+  static defaultProps = {
+    tracks: [
+      {name: "snare", sample: "snare.ogg", beats: new Array(12).fill(false)},
+      {name: "kick", sample: "kick.ogg", beats: new Array(12).fill(false)},
+    ]
   };
 
   constructor(props: Object) {
     super(props);
-    this.state = {cells: initMatrix(16, 4)};
+    const {tracks} = props;
+    this.state = {tracks};
   }
 
-  update = (x: number, y: number, v: number) => {
-    this.setState(({cells}) => {
+  update = (name: string, beat: number) => {
+    this.setState(({tracks}) => {
       return {
-        cells: cells.map((row, _y) => {
-          if (_y !== y) {
-            return row;
+        tracks: tracks.map((track: Track) => {
+          if (track.name !== name) {
+            return track;
           } else {
-            return row.map((_v, _x) => {
-              if (_x !== x) {
-                return _v;
-              } else {
-                return _v === 0 ? 1 : 0;
-              }
-            });
+            return {
+              ...track,
+              beats: track.beats.map((v, i) => i !== beat ? v : !v)
+            };
           }
         })
       }
@@ -51,21 +76,8 @@ class App extends Component {
   };
 
   render() {
-    const {cells} = this.state;
-    return (
-      <div>
-        <p>let's there be rock</p>
-        <div>{
-          cells.map((row, y) => {
-            return <div key={y} className="row">{
-              row.map((v, x) => {
-                return <Cell key={x} {...{x, y, v}} update={this.update} />
-              })
-            }</div>
-          })
-        }</div>
-      </div>
-    );
+    const {tracks} = this.state;
+    return <TrackListView tracks={tracks} update={this.update} />;
   }
 }
 
