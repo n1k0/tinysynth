@@ -9,7 +9,6 @@
   background: pink;
 }
 
-.beat:nth-of-type(3),
 .beat:nth-of-type(7),
 .beat:nth-of-type(11),
 .beat:nth-of-type(15) {

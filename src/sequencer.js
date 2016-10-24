@@ -37,9 +37,10 @@ function loopProcessor(tracks) {
   const keys = new Tone.MultiPlayer({urls}).toMaster();
 
   return (time, index) => {
-    tracks.forEach(({name, vol, beats}) => {
+    tracks.forEach(({name, vol, muted, beats}) => {
       if (beats[index]) {
-        keys.start(name, time, 0, "1n", 0, velocities[index] * vol);
+        // XXX "1n" should be set via some "resolution" track prop
+        keys.start(name, time, 0, "1n", 0, muted ? 0 : velocities[index] * vol);
       }
     });
   };

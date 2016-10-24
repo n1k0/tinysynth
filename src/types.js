@@ -4,6 +4,7 @@ export type Track = {
   name: string,
   sample: string,
   vol: number,
+  muted: boolean,
   beats: boolean[],
 };
 
