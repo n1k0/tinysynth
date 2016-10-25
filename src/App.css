@@ -1,6 +1,8 @@
 .track th {
   text-align: right;
+  width: 170px;
 }
+
 .track .vol {
   width: 140px;
 }
@@ -35,6 +37,10 @@
   display: inline-block;
   width: 40px;
   height: 40px;
+}
+
+.controls td {
+  padding-top: .5em;
 }
 
 .bpm input {

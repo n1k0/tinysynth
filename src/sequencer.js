@@ -34,8 +34,10 @@ export function updateBPM(bpm: number): void {
 }
 
 function loopProcessor(tracks, beatNotifier: BeatNotifier) {
-  const urls = tracks.reduce((acc, {name, sample}) => {
-    return {...acc, [name]: sample};
+  // XXX this may be now totally unnecessary as we can infer the sample url
+  // directly from the name
+  const urls = tracks.reduce((acc, {name}) => {
+    return {...acc, [name]: `audio/${name}.wav`};
   }, {});
 
   const keys = new Tone.MultiPlayer({urls}).toMaster();
@@ -44,8 +46,13 @@ function loopProcessor(tracks, beatNotifier: BeatNotifier) {
     beatNotifier(index);
     tracks.forEach(({name, vol, muted, beats}) => {
       if (beats[index]) {
-        // XXX "1n" should be set via some "resolution" track prop
-        keys.start(name, time, 0, "1n", 0, muted ? 0 : velocities[index] * vol);
+        try {
+          // XXX "1n" should be set via some "resolution" track prop
+          keys.start(name, time, 0, "1n", 0, muted ? 0 : velocities[index] * vol);
+        } catch(e) {
+          // We're most likely in a race condition where the new sample hasn't been loaded
+          // just yet; silently ignore, it will resiliently catch up later.
+        }
       }
     });
   };
