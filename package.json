@@ -11,9 +11,10 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
-    "tone": "^0.8.0",
     "react": "^15.3.2",
-    "react-dom": "^15.3.2"
+    "react-dom": "^15.3.2",
+    "react-mdl": "^1.7.2",
+    "tone": "^0.8.0"
   },
   "devDependencies": {
     "flow-bin": "^0.33.0",

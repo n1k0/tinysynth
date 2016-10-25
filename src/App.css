@@ -1,9 +1,12 @@
-th {
-  font-size: .9em;
+.track th {
+  text-align: right;
+}
+.track .vol {
+  width: 140px;
 }
 
-input[type=range] {
-  width: 80px;
+.track .mute {
+  width: 56px;
 }
 
 .beat {
@@ -34,26 +37,8 @@ input[type=range] {
   height: 40px;
 }
 
-.btn {
-  display: inline-block;
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 2px;
-  padding: .5em;
-  color: #777;
-}
-
-.bpm input[type=range] {
-  margin-top: 1em;
-}
-
-.bpm input[type=number] {
-  border: 0;
+.bpm input {
   width: 60px;
-  font-size: .9em;
-  margin-top: -1em;
-}
-
-.controls .btn {
-  margin-right: .5em;
+  border: 0;
+  font-size: 1em;
 }
