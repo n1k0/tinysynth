@@ -3,7 +3,17 @@
 import type { Track, ToneLoop } from "./types";
 
 import React, { Component } from "react";
-import { FABButton, Icon, Slider, Switch } from "react-mdl";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FABButton,
+  Icon,
+  Slider,
+  Switch,
+} from "react-mdl";
 
 import "./App.css";
 import "react-mdl/extra/css/material.light_blue-pink.min.css";
@@ -11,6 +21,7 @@ import "react-mdl/extra/material.js";
 
 import * as sequencer from "./sequencer";
 import samples from "./samples.json";
+
 
 function initTracks(): Track[] {
   return [
@@ -77,6 +88,21 @@ function _updateTrackSample(tracks, id, sample) {
       return track;
     } else {
       return {...track, name: sample};
+    }
+  });
+}
+
+function encodeTracks(tracks) {
+  return tracks.map((track) => {
+    return {...track, beats: track.beats.map(beat => beat ? 1 : 0).join("")}
+  });
+}
+
+function decodeTracks(encodedTracks) {
+  return encodedTracks.map((encodedTrack) => {
+    return {
+      ...encodedTrack,
+      beats: encodedTrack.beats.split("").map(beat => Boolean(parseInt(beat, 10))),
     }
   });
 }
@@ -198,6 +224,25 @@ function Controls({bpm, updateBPM, playing, start, stop, addTrack, share}) {
   );
 }
 
+function ShareDialog({hash, closeDialog}) {
+  return (
+    <Dialog open>
+      <DialogTitle>Share</DialogTitle>
+      <DialogContent>
+        <p>Send this link to your friends so they can enjoy your piece:</p>
+        <p className="share-link" style={{textAlign: "center"}}>
+          <a className="mdl-button mdl-js-button mdl-button--colored"
+            href={"#" + hash} onClick={event => event.preventDefault()}>Link</a>
+        </p>
+        <p>Right-click, <em>Copy link address</em> to copy the link.</p>
+      </DialogContent>
+      <DialogActions>
+        <Button colored type="button" onClick={closeDialog}>close</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 class App extends Component {
   loop: ToneLoop;
 
@@ -206,18 +251,39 @@ class App extends Component {
     currentBeat: number,
     playing: boolean,
     tracks: Track[],
+    shareHash: ?string,
   };
 
   constructor(props: {}) {
     super(props);
-    const tracks = initTracks();
+    const hash = location.hash.substr(1);
+    if (hash.length > 0) {
+      try {
+        const rawState = JSON.parse(atob(hash));
+        this.initializeState({
+          ...rawState,
+          tracks: decodeTracks(rawState.tracks),
+        });
+      } catch(e) {
+        console.warn("Unable to parse hash", hash, e);
+      } finally {
+        this.initializeState({tracks: initTracks()});
+        location.hash = "";
+      }
+    } else {
+      this.initializeState({tracks: initTracks()});
+    }
+  }
+
+  initializeState(state) {
     this.state = {
       bpm: 120,
-      currentBeat: -1,
       playing: false,
-      tracks,
+      currentBeat: -1,
+      shareHash: null,
+      ...state,
     };
-    this.loop = sequencer.create(tracks, this.updateCurrentBeat);
+    this.loop = sequencer.create(state.tracks, this.updateCurrentBeat);
   }
 
   start = () => {
@@ -270,16 +336,24 @@ class App extends Component {
     this.updateTracks(_updateTrackSample(tracks, id, sample));
   };
 
+  closeDialog = () => {
+    this.setState({shareHash: null});
+  };
+
   share = () => {
-    console.log(JSON.stringify(this.state, null, 2));
+    const {bpm, tracks} = this.state;
+    const shareHash = btoa(JSON.stringify({bpm, tracks: encodeTracks(tracks)}));
+    this.setState({shareHash});
   };
 
   render() {
-    const {bpm, currentBeat, playing, tracks} = this.state;
-    const {updateBPM, start, stop, addTrack, share} = this;
+    const {bpm, currentBeat, playing, shareHash, tracks} = this.state;
+    const {updateBPM, start, stop, addTrack, share, closeDialog} = this;
     return (
       <div>
         <h3>tinysynth</h3>
+        {shareHash ?
+          <ShareDialog hash={shareHash} closeDialog={closeDialog} /> : null}
         <table>
           <TrackListView
             tracks={tracks}
