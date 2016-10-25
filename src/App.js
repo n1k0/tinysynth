@@ -284,6 +284,7 @@ class App extends Component {
       ...state,
     };
     this.loop = sequencer.create(state.tracks, this.updateCurrentBeat);
+    this.updateBPM(this.state.bpm);
   }
 
   start = () => {
