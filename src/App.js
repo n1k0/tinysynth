@@ -266,8 +266,8 @@ class App extends Component {
         });
       } catch(e) {
         console.warn("Unable to parse hash", hash, e);
-      } finally {
         this.initializeState({tracks: initTracks()});
+      } finally {
         location.hash = "";
       }
     } else {
