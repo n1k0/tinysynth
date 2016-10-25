@@ -1,3 +1,11 @@
+th {
+  font-size: .9em;
+}
+
+input[type=range] {
+  width: 80px;
+}
+
 .beat {
   background: #eee;
   text-align: center;
@@ -9,6 +17,11 @@
   background: pink;
 }
 
+.beat.current {
+  background: #f5f5eb;
+}
+
+.beat:nth-of-type(3),
 .beat:nth-of-type(7),
 .beat:nth-of-type(11),
 .beat:nth-of-type(15) {
@@ -19,4 +32,28 @@
   display: inline-block;
   width: 40px;
   height: 40px;
+}
+
+.btn {
+  display: inline-block;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 2px;
+  padding: .5em;
+  color: #777;
+}
+
+.bpm input[type=range] {
+  margin-top: 1em;
+}
+
+.bpm input[type=number] {
+  border: 0;
+  width: 60px;
+  font-size: .9em;
+  margin-top: -1em;
+}
+
+.controls .btn {
+  margin-right: .5em;
 }

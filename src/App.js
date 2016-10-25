@@ -2,18 +2,18 @@
 
 import type { Track, ToneLoop } from "./types";
 
-import React, { Component } from 'react';
-import './App.css';
+import React, { Component } from "react";
+import "./App.css";
 
 import * as sequencer from "./sequencer";
 
 
 function initTracks(): Track[] {
   return [
-    {name: "hi-hat (open)", sample: "audio/hihato.wav", vol: .8, muted: false, beats: initBeats(16)},
-    {name: "hi-hat (close)", sample: "audio/hihatc.wav", vol: .8, muted: false, beats: initBeats(16)},
-    {name: "snare", sample: "audio/snare.wav", vol: 1, muted: false, beats: initBeats(16)},
-    {name: "kick", sample: "audio/kick.wav", vol: 1, muted: false, beats: initBeats(16)},
+    {name: "hi-hat (open)", sample: "audio/hihato.wav", vol: .4, muted: false, beats: initBeats(16)},
+    {name: "hi-hat (close)", sample: "audio/hihatc.wav", vol: .4, muted: false, beats: initBeats(16)},
+    {name: "snare", sample: "audio/snare.wav", vol: .9, muted: false, beats: initBeats(16)},
+    {name: "kick", sample: "audio/kick.wav", vol: .8, muted: false, beats: initBeats(16)},
   ];
 }
 
@@ -54,11 +54,12 @@ function _muteTrack(tracks, name) {
   });
 }
 
-function TrackView({track, toggleTrackBeat, setTrackVolume, muteTrack}: {
-  track: Track,
-  toggleTrackBeat: (name: string, beat: number) => void,
-  setTrackVolume: (name: string, vol: number) => void,
-  muteTrack: (name: string) => void,
+function TrackView({
+  track,
+  currentBeat,
+  toggleTrackBeat,
+  setTrackVolume,
+  muteTrack,
 }) {
   return (
     <tr className="track">
@@ -70,42 +71,68 @@ function TrackView({track, toggleTrackBeat, setTrackVolume, muteTrack}: {
         <input type="checkbox" checked={!track.muted}
           onChange={event => muteTrack(track.name)} /></td>
       {
-        track.beats.map((v, beat) => (
-          <td key={beat} className={`beat ${v ? "active" : ""}`}>
-            <a href="" onClick={(event) => {
-              event.preventDefault();
-              toggleTrackBeat(track.name, beat);
-            }} />
-          </td>
-        ))
+        track.beats.map((v, beat) => {
+          const beatClass = v ? "active" : beat === currentBeat ? "current" : "";
+          return (
+            <td key={beat} className={`beat ${beatClass}`}>
+              <a href="" onClick={(event) => {
+                event.preventDefault();
+                toggleTrackBeat(track.name, beat);
+              }} />
+            </td>
+          );
+        })
       }
     </tr>
   );
 }
 
-function TrackListView({tracks, toggleTrackBeat, setTrackVolume, muteTrack}) {
+function TrackListView({
+  tracks,
+  currentBeat,
+  toggleTrackBeat,
+  setTrackVolume,
+  muteTrack,
+}) {
   return (
-    <div>
-      <h3>tinysynth</h3>
-      <table>
-        <tbody>{
-          tracks.map((track, i) => {
-            return (
-              <TrackView key={i}
-                track={track}
-                toggleTrackBeat={toggleTrackBeat}
-                setTrackVolume={setTrackVolume}
-                muteTrack={muteTrack} />
-              );
-          })
-        }</tbody>
-      </table>
+    <table>
+      <tbody>{
+        tracks.map((track, i) => {
+          return (
+            <TrackView key={i}
+              track={track}
+              currentBeat={currentBeat}
+              toggleTrackBeat={toggleTrackBeat}
+              setTrackVolume={setTrackVolume}
+              muteTrack={muteTrack} />
+            );
+        })
+      }</tbody>
+    </table>
+  );
+}
+
+function Controls({bpm, updateBPM, start, stop}) {
+  const onChange = event => updateBPM(parseInt(event.target.value, 10));
+  return (
+    <div className="controls">
+      <button className="btn btn-start" onClick={start}>Play</button>
+      <button className="btn btn-stop" onClick={stop}>Stop</button>
+      <div className="bpm">
+        <label>
+          BPM
+          <input type="range" min="30" max="240" value={bpm} onChange={onChange}/>
+          <input type="number" value={bpm} onChange={onChange} />
+        </label>
+      </div>
     </div>
   );
 }
 
 class App extends Component {
   state: {
+    bpm: number,
+    currentBeat: number,
     loop: ToneLoop,
     tracks: Track[],
   };
@@ -113,7 +140,12 @@ class App extends Component {
   constructor(props: {}) {
     super(props);
     const tracks = initTracks();
-    this.state = {tracks, loop: sequencer.create(tracks)};
+    this.state = {
+      bpm: 120,
+      currentBeat: -1,
+      tracks, loop:
+      sequencer.create(tracks, this.updateCurrentBeat),
+    };
   }
 
   start = () => {
@@ -122,13 +154,18 @@ class App extends Component {
 
   stop = () => {
     this.state.loop.stop();
+    this.setState({currentBeat: -1});
+  };
+
+  updateCurrentBeat = (beat: number): void => {
+    this.setState({currentBeat: beat});
   };
 
   updateTracks = (newTracks: Track[]) => {
     const {loop} = this.state;
     this.setState({
       tracks: newTracks,
-      loop: sequencer.update(loop, newTracks),
+      loop: sequencer.update(loop, newTracks, this.updateCurrentBeat),
     });
   };
 
@@ -144,20 +181,28 @@ class App extends Component {
 
   muteTrack = (name: string) => {
     const {tracks} = this.state;
-    this.updateTracks( _muteTrack(tracks, name));
+    this.updateTracks(_muteTrack(tracks, name));
   };
 
+  updateBPM = (newBpm: number) => {
+    const {bpm} = this.state;
+    sequencer.updateBPM(bpm);
+    this.setState({bpm: newBpm});
+  }
+
   render() {
-    const {tracks} = this.state;
+    const {bpm, currentBeat, tracks} = this.state;
+    const {updateBPM, start, stop} = this;
     return (
       <div>
+        <h3>tinysynth</h3>
         <TrackListView
           tracks={tracks}
+          currentBeat={currentBeat}
           toggleTrackBeat={this.toggleTrackBeat}
           setTrackVolume={this.setTrackVolume}
           muteTrack={this.muteTrack} />
-        <button onClick={this.start}>start</button>
-        <button onClick={this.stop}>stop</button>
+        <Controls {...{bpm, updateBPM, start, stop}} />
       </div>
     );
   }
