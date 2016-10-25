@@ -14,10 +14,10 @@ import samples from "./samples.json";
 
 function initTracks(): Track[] {
   return [
-    {name: "hihat-reso", vol: .4, muted: false, beats: initBeats(16)},
-    {name: "hihat-plain", vol: .4, muted: false, beats: initBeats(16)},
-    {name: "snare-vinyl01", vol: .9, muted: false, beats: initBeats(16)},
-    {name: "kick-electro01", vol: .8, muted: false, beats: initBeats(16)},
+    {id: 1, name: "hihat-reso", vol: .4, muted: false, beats: initBeats(16)},
+    {id: 2, name: "hihat-plain", vol: .4, muted: false, beats: initBeats(16)},
+    {id: 3, name: "snare-vinyl01", vol: .9, muted: false, beats: initBeats(16)},
+    {id: 4, name: "kick-electro01", vol: .8, muted: false, beats: initBeats(16)},
   ];
 }
 
@@ -25,9 +25,22 @@ function initBeats(n) {
   return new Array(n).fill(false);
 }
 
-function _toggleTrackBeat(tracks, name, beat) {
+function _addTrack(tracks) {
+  const id = Math.max.apply(null, tracks.map(t => t.id)) + 1;
+  return [
+    ...tracks, {
+      id,
+      name: "kick-electro01",
+      vol: .8,
+      muted: false,
+      beats: initBeats(16),
+    }
+  ];
+}
+
+function _toggleTrackBeat(tracks, id, beat) {
   return tracks.map((track: Track) => {
-    if (track.name !== name) {
+    if (track.id !== id) {
       return track;
     } else {
       return {
@@ -38,9 +51,9 @@ function _toggleTrackBeat(tracks, name, beat) {
   });
 }
 
-function _setTrackVolume(tracks, name, vol) {
+function _setTrackVolume(tracks, id, vol) {
   return tracks.map((track: Track) => {
-    if (track.name !== name) {
+    if (track.id !== id) {
       return track;
     } else {
       return {...track, vol};
@@ -48,9 +61,9 @@ function _setTrackVolume(tracks, name, vol) {
   });
 }
 
-function _muteTrack(tracks, name) {
+function _muteTrack(tracks, id) {
   return tracks.map((track: Track) => {
-    if (track.name !== name) {
+    if (track.id !== id) {
       return track;
     } else {
       return {...track, muted: !track.muted};
@@ -58,9 +71,9 @@ function _muteTrack(tracks, name) {
   });
 }
 
-function _updateTrackSample(tracks, name, sample) {
+function _updateTrackSample(tracks, id, sample) {
   return tracks.map((track: Track) => {
-    if (track.name !== name) {
+    if (track.id !== id) {
       return track;
     } else {
       return {...track, name: sample};
@@ -88,8 +101,8 @@ class SampleSelector extends Component {
   };
 
   onChange = (event) => {
-    const {current, onChange} = this.props;
-    onChange(current, event.target.value);
+    const {id, onChange} = this.props;
+    onChange(id, event.target.value);
     this.close();
   };
 
@@ -124,14 +137,14 @@ function TrackListView({
         return (
           <tr key={i}className="track">
             <th>
-              <SampleSelector current={track.name} onChange={updateTrackSample} />
+              <SampleSelector id={track.id} current={track.name} onChange={updateTrackSample} />
             </th>
             <td className="vol">
               <Slider min={0} max={1} step={.1} value={track.vol}
-                onChange={event => setTrackVolume(track.name, parseFloat(event.target.value))} />
+                onChange={event => setTrackVolume(track.id, parseFloat(event.target.value))} />
             </td>
             <td className="mute">
-              <Switch defaultChecked={!track.muted} onChange={event => muteTrack(track.name)} />
+              <Switch defaultChecked={!track.muted} onChange={event => muteTrack(track.id)} />
             </td>
             {
               track.beats.map((v, beat) => {
@@ -140,7 +153,7 @@ function TrackListView({
                   <td key={beat} className={`beat ${beatClass}`}>
                     <a href="" onClick={(event) => {
                       event.preventDefault();
-                      toggleTrackBeat(track.name, beat);
+                      toggleTrackBeat(track.id, beat);
                     }} />
                   </td>
                 );
@@ -153,12 +166,17 @@ function TrackListView({
   );
 }
 
-function Controls({bpm, updateBPM, playing, start, stop, share}) {
+function Controls({bpm, updateBPM, playing, start, stop, addTrack, share}) {
   const onChange = event => updateBPM(parseInt(event.target.value, 10));
   return (
     <tfoot className="controls">
       <tr>
-        <td colSpan="2" />
+        <td style={{textAlign: "right"}}>
+          <FABButton mini colored onClick={addTrack} title="Add new track">
+            <Icon name="add" />
+          </FABButton>
+        </td>
+        <td />
         <td>
           <FABButton mini colored onClick={playing ? stop : start}>
             <Icon name={playing ? "stop" : "play_arrow"} />
@@ -221,19 +239,24 @@ class App extends Component {
     this.setState({tracks: newTracks});
   };
 
-  toggleTrackBeat = (name: string, beat: number) => {
+  addTrack = () => {
     const {tracks} = this.state;
-    this.updateTracks(_toggleTrackBeat(tracks, name, beat));
+    this.updateTracks(_addTrack(tracks));
   };
 
-  setTrackVolume = (name: string, vol: number) => {
+  toggleTrackBeat = (id: number, beat: number) => {
     const {tracks} = this.state;
-    this.updateTracks(_setTrackVolume(tracks, name, vol));
+    this.updateTracks(_toggleTrackBeat(tracks, id, beat));
   };
 
-  muteTrack = (name: string) => {
+  setTrackVolume = (id: number, vol: number) => {
     const {tracks} = this.state;
-    this.updateTracks(_muteTrack(tracks, name));
+    this.updateTracks(_setTrackVolume(tracks, id, vol));
+  };
+
+  muteTrack = (id: number) => {
+    const {tracks} = this.state;
+    this.updateTracks(_muteTrack(tracks, id));
   };
 
   updateBPM = (newBpm: number) => {
@@ -242,9 +265,9 @@ class App extends Component {
     this.setState({bpm: newBpm});
   };
 
-  updateTrackSample = (name: string, sample: string) => {
+  updateTrackSample = (id: number, sample: string) => {
     const {tracks} = this.state;
-    this.updateTracks(_updateTrackSample(tracks, name, sample));
+    this.updateTracks(_updateTrackSample(tracks, id, sample));
   };
 
   share = () => {
@@ -253,7 +276,7 @@ class App extends Component {
 
   render() {
     const {bpm, currentBeat, playing, tracks} = this.state;
-    const {updateBPM, start, stop, share} = this;
+    const {updateBPM, start, stop, addTrack, share} = this;
     return (
       <div>
         <h3>tinysynth</h3>
@@ -265,7 +288,7 @@ class App extends Component {
             setTrackVolume={this.setTrackVolume}
             updateTrackSample={this.updateTrackSample}
             muteTrack={this.muteTrack} />
-          <Controls {...{bpm, updateBPM, playing, start, stop, share}} />
+          <Controls {...{bpm, updateBPM, playing, start, stop, addTrack, share}} />
         </table>
       </div>
     );

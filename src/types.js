@@ -10,6 +10,7 @@ export type ToneLoop = {
 };
 
 export type Track = {
+  id: number,
   name: string,
   vol: number,
   muted: boolean,
