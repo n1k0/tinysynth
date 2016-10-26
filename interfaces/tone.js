@@ -4,9 +4,9 @@ declare module "tone" {
     start: () => void,
   };
   declare class Sequence {
-    callback: Function,
     start: () => void,
     stop: () => void,
+    callback: (time: number, index: number) => void,
   }
   declare class MultiPlayer {
     toMaster: () => {start: () => void};

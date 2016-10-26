@@ -1,6 +1,8 @@
 /* @flow */
 
-import type { Track, ToneLoop, EncodedTrack } from "./types";
+import type { Track, EncodedTrack } from "./types";
+
+import Tone from "tone";
 
 import React, { Component } from "react";
 import {
@@ -168,7 +170,7 @@ function ShareDialog({hash, closeDialog}) {
 }
 
 class App extends Component {
-  loop: ToneLoop;
+  loop: Tone.Sequence;
 
   state: {
     bpm: number,

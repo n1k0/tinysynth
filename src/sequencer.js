@@ -1,5 +1,5 @@
 /* @flow */
-import type { Track, ToneLoop, BeatNotifier } from "./types";
+import type { Track, BeatNotifier } from "./types";
 
 import Tone from "tone";
 
@@ -11,7 +11,7 @@ const velocities = [
   1, .5, .75, .5,
 ];
 
-export function create(tracks: Track[], beatNotifier: BeatNotifier): ToneLoop {
+export function create(tracks: Track[], beatNotifier: BeatNotifier): Tone.Sequence {
   const loop = new Tone.Sequence(
     loopProcessor(tracks, beatNotifier),
     new Array(16).fill(0).map((_, i) => i),
@@ -24,7 +24,7 @@ export function create(tracks: Track[], beatNotifier: BeatNotifier): ToneLoop {
   return loop;
 }
 
-export function update(loop: ToneLoop, tracks: Track[], beatNotifier: BeatNotifier): ToneLoop {
+export function update(loop: Tone.Sequence, tracks: Track[], beatNotifier: BeatNotifier): Tone.Sequence {
   loop.callback = loopProcessor(tracks, beatNotifier);
   return loop;
 }
