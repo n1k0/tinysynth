@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Track, ToneLoop } from "./types";
+import type { Track, ToneLoop, EncodedTrack } from "./types";
 
 import React, { Component } from "react";
 import {
@@ -183,10 +183,10 @@ class App extends Component {
     const hash = location.hash.substr(1);
     if (hash.length > 0) {
       try {
-        const rawState = JSON.parse(atob(hash));
+        const rawSong: {bpm: number, tracks: EncodedTrack[]} = JSON.parse(atob(hash));
         this.initializeState({
-          ...rawState,
-          tracks: model.decodeTracks(rawState.tracks),
+          ...rawSong,
+          tracks: model.decodeTracks(rawSong.tracks),
         });
       } catch(e) {
         console.warn("Unable to parse hash", hash, e);

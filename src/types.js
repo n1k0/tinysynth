@@ -16,3 +16,11 @@ export type Track = {
   muted: boolean,
   beats: boolean[],
 };
+
+export type EncodedTrack = {
+  id: number,
+  name: string,
+  vol: number,
+  muted: boolean,
+  beats: string,
+};

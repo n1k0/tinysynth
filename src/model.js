@@ -1,5 +1,5 @@
 /* @flow */
-import type { Track } from "./types";
+import type { Track, EncodedTrack } from "./types";
 
 import samples from "./samples.json";
 
@@ -13,11 +13,11 @@ export function initTracks(): Track[] {
   ];
 }
 
-export function initBeats(n) {
+export function initBeats(n: number): boolean[] {
   return new Array(n).fill(false);
 }
 
-export function addTrack(tracks) {
+export function addTrack(tracks: Track[]) {
   const id = Math.max.apply(null, tracks.map(t => t.id)) + 1;
   return [
     ...tracks, {
@@ -30,14 +30,12 @@ export function addTrack(tracks) {
   ];
 }
 
-export function deleteTracks(tracks, id) {
-  return tracks.filter((track: Track) => {
-    return track.id !== id;
-  });
+export function deleteTracks(tracks: Track[], id: number): Track[] {
+  return tracks.filter((track) => track.id !== id);
 }
 
-export function toggleTrackBeat(tracks, id, beat) {
-  return tracks.map((track: Track) => {
+export function toggleTrackBeat(tracks: Track[], id: number, beat: number): Track[] {
+  return tracks.map((track) => {
     if (track.id !== id) {
       return track;
     } else {
@@ -49,8 +47,8 @@ export function toggleTrackBeat(tracks, id, beat) {
   });
 }
 
-export function setTrackVolume(tracks, id, vol) {
-  return tracks.map((track: Track) => {
+export function setTrackVolume(tracks: Track[], id: number, vol: number): Track[] {
+  return tracks.map((track) => {
     if (track.id !== id) {
       return track;
     } else {
@@ -59,8 +57,8 @@ export function setTrackVolume(tracks, id, vol) {
   });
 }
 
-export function muteTrack(tracks, id) {
-  return tracks.map((track: Track) => {
+export function muteTrack(tracks: Track[], id: number): Track[] {
+  return tracks.map((track) => {
     if (track.id !== id) {
       return track;
     } else {
@@ -69,8 +67,8 @@ export function muteTrack(tracks, id) {
   });
 }
 
-export function updateTrackSample(tracks, id, sample) {
-  return tracks.map((track: Track) => {
+export function updateTrackSample(tracks: Track[], id: number, sample: string): Track[] {
+  return tracks.map((track) => {
     if (track.id !== id) {
       return track;
     } else {
@@ -79,22 +77,27 @@ export function updateTrackSample(tracks, id, sample) {
   });
 }
 
-export function encodeTracks(tracks) {
-  return tracks.map((track) => {
-    return {...track, beats: track.beats.map(beat => beat ? 1 : 0).join("")}
+function encodeBeats(beats: boolean[]): string {
+  return beats.map(beat => beat ? "1" : "0").join("");
+}
+
+function decodeBeats(encodedBeats: string): boolean[] {
+  return encodedBeats.split("").map(beat => beat === "1");
+}
+
+export function encodeTracks(tracks: Track[]): EncodedTrack[] {
+  return tracks.map(({beats, ...track}) => {
+    return {...track, beats: encodeBeats(beats)};
   });
 }
 
-export function decodeTracks(encodedTracks) {
-  return encodedTracks.map((encodedTrack) => {
-    return {
-      ...encodedTrack,
-      beats: encodedTrack.beats.split("").map(beat => Boolean(parseInt(beat, 10))),
-    }
+export function decodeTracks(encodedTracks: EncodedTrack[]): Track[] {
+  return encodedTracks.map(({beats, ...encodedTrack}) => {
+    return {...encodedTrack, beats: decodeBeats(beats)};
   });
 }
 
-export function randomTracks() {
+export function randomTracks(): Track[] {
   const nT = Math.floor(3 + (Math.random() * 10));
   return new Array(nT).fill().map((_, i) => {
     return {
@@ -107,7 +110,7 @@ export function randomTracks() {
   });
 }
 
-export function randomSong() {
+export function randomSong(): {bpm: number, tracks: Track[]} {
   return {
     bpm: Math.floor(Math.random() * 75) + 75,
     tracks: randomTracks(),
