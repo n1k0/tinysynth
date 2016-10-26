@@ -1,3 +1,7 @@
+.app {
+  margin: 1em 0 0 2em;
+}
+
 .track th {
   text-align: right;
   width: 170px;

@@ -351,7 +351,7 @@ class App extends Component {
     const {bpm, currentBeat, playing, shareHash, tracks} = this.state;
     const {updateBPM, start, stop, addTrack, share, closeDialog} = this;
     return (
-      <div>
+      <div className="app">
         <h3>tinysynth</h3>
         {shareHash ?
           <ShareDialog hash={shareHash} closeDialog={closeDialog} /> : null}
