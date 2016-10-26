@@ -20,98 +20,9 @@ import "react-mdl/extra/css/material.light_blue-pink.min.css";
 import "react-mdl/extra/material.js";
 
 import * as sequencer from "./sequencer";
+import * as model from "./model";
 import samples from "./samples.json";
 
-
-function initTracks(): Track[] {
-  return [
-    {id: 1, name: "hihat-reso", vol: .4, muted: false, beats: initBeats(16)},
-    {id: 2, name: "hihat-plain", vol: .4, muted: false, beats: initBeats(16)},
-    {id: 3, name: "snare-vinyl01", vol: .9, muted: false, beats: initBeats(16)},
-    {id: 4, name: "kick-electro01", vol: .8, muted: false, beats: initBeats(16)},
-  ];
-}
-
-function initBeats(n) {
-  return new Array(n).fill(false);
-}
-
-function _addTrack(tracks) {
-  const id = Math.max.apply(null, tracks.map(t => t.id)) + 1;
-  return [
-    ...tracks, {
-      id,
-      name: "kick-electro01",
-      vol: .8,
-      muted: false,
-      beats: initBeats(16),
-    }
-  ];
-}
-
-function _deleteTracks(tracks, id) {
-  return tracks.filter((track: Track) => {
-    return track.id !== id;
-  });
-}
-
-function _toggleTrackBeat(tracks, id, beat) {
-  return tracks.map((track: Track) => {
-    if (track.id !== id) {
-      return track;
-    } else {
-      return {
-        ...track,
-        beats: track.beats.map((v, i) => i !== beat ? v : !v)
-      };
-    }
-  });
-}
-
-function _setTrackVolume(tracks, id, vol) {
-  return tracks.map((track: Track) => {
-    if (track.id !== id) {
-      return track;
-    } else {
-      return {...track, vol};
-    }
-  });
-}
-
-function _muteTrack(tracks, id) {
-  return tracks.map((track: Track) => {
-    if (track.id !== id) {
-      return track;
-    } else {
-      return {...track, muted: !track.muted};
-    }
-  });
-}
-
-function _updateTrackSample(tracks, id, sample) {
-  return tracks.map((track: Track) => {
-    if (track.id !== id) {
-      return track;
-    } else {
-      return {...track, name: sample};
-    }
-  });
-}
-
-function encodeTracks(tracks) {
-  return tracks.map((track) => {
-    return {...track, beats: track.beats.map(beat => beat ? 1 : 0).join("")}
-  });
-}
-
-function decodeTracks(encodedTracks) {
-  return encodedTracks.map((encodedTrack) => {
-    return {
-      ...encodedTrack,
-      beats: encodedTrack.beats.split("").map(beat => Boolean(parseInt(beat, 10))),
-    }
-  });
-}
 
 class SampleSelector extends Component {
   state: {
@@ -275,16 +186,16 @@ class App extends Component {
         const rawState = JSON.parse(atob(hash));
         this.initializeState({
           ...rawState,
-          tracks: decodeTracks(rawState.tracks),
+          tracks: model.decodeTracks(rawState.tracks),
         });
       } catch(e) {
         console.warn("Unable to parse hash", hash, e);
-        this.initializeState({tracks: initTracks()});
+        this.initializeState({tracks: model.initTracks()});
       } finally {
         location.hash = "";
       }
     } else {
-      this.initializeState({tracks: initTracks()});
+      this.initializeState({tracks: model.initTracks()});
     }
   }
 
@@ -321,27 +232,27 @@ class App extends Component {
 
   addTrack = () => {
     const {tracks} = this.state;
-    this.updateTracks(_addTrack(tracks));
+    this.updateTracks(model.addTrack(tracks));
   };
 
   deleteTrack = (id: number) => {
     const {tracks} = this.state;
-    this.updateTracks(_deleteTracks(tracks, id));
+    this.updateTracks(model.deleteTracks(tracks, id));
   };
 
   toggleTrackBeat = (id: number, beat: number) => {
     const {tracks} = this.state;
-    this.updateTracks(_toggleTrackBeat(tracks, id, beat));
+    this.updateTracks(model.toggleTrackBeat(tracks, id, beat));
   };
 
   setTrackVolume = (id: number, vol: number) => {
     const {tracks} = this.state;
-    this.updateTracks(_setTrackVolume(tracks, id, vol));
+    this.updateTracks(model.setTrackVolume(tracks, id, vol));
   };
 
   muteTrack = (id: number) => {
     const {tracks} = this.state;
-    this.updateTracks(_muteTrack(tracks, id));
+    this.updateTracks(model.muteTrack(tracks, id));
   };
 
   updateBPM = (newBpm: number) => {
@@ -352,28 +263,44 @@ class App extends Component {
 
   updateTrackSample = (id: number, sample: string) => {
     const {tracks} = this.state;
-    this.updateTracks(_updateTrackSample(tracks, id, sample));
+    this.updateTracks(model.updateTrackSample(tracks, id, sample));
   };
 
   closeDialog = () => {
     this.setState({shareHash: null});
   };
 
+  randomSong = () => {
+    const {bpm, tracks} = model.randomSong();
+    this.updateTracks(tracks);
+    sequencer.updateBPM(bpm);
+  };
+
   share = () => {
     const {bpm, tracks} = this.state;
-    const shareHash = btoa(JSON.stringify({bpm, tracks: encodeTracks(tracks)}));
+    const shareHash = btoa(JSON.stringify({
+      bpm,
+      tracks: model.encodeTracks(tracks),
+    }));
     this.setState({shareHash});
   };
 
   render() {
     const {bpm, currentBeat, playing, shareHash, tracks} = this.state;
-    const {updateBPM, start, stop, addTrack, share, closeDialog} = this;
+    const {updateBPM, start, stop, addTrack, share, randomSong, closeDialog} = this;
     return (
       <div className="app">
         <h3>tinysynth</h3>
         {shareHash ?
           <ShareDialog hash={shareHash} closeDialog={closeDialog} /> : null}
         <table>
+          <tr>
+            <td colSpan="19">
+              <p style={{textAlign: "right"}}>
+                <Button type="button" colored onClick={randomSong}>I am uninspired, get me some random tracks</Button>
+              </p>
+            </td>
+          </tr>
           <TrackListView
             tracks={tracks}
             currentBeat={currentBeat}
@@ -381,6 +308,7 @@ class App extends Component {
             setTrackVolume={this.setTrackVolume}
             updateTrackSample={this.updateTrackSample}
             muteTrack={this.muteTrack}
+            randomSong={this.randomSong}
             deleteTrack={this.deleteTrack} />
           <Controls {...{bpm, updateBPM, playing, start, stop, addTrack, share}} />
         </table>
