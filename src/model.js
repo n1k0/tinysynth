@@ -109,7 +109,7 @@ export function randomTracks() {
 
 export function randomSong() {
   return {
-    bpm: Math.floor(Math.random() * 30) + 120,
+    bpm: Math.floor(Math.random() * 75) + 75,
     tracks: randomTracks(),
   };
 }

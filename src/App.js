@@ -256,8 +256,7 @@ class App extends Component {
   };
 
   updateBPM = (newBpm: number) => {
-    const {bpm} = this.state;
-    sequencer.updateBPM(bpm);
+    sequencer.updateBPM(newBpm);
     this.setState({bpm: newBpm});
   };
 
@@ -273,7 +272,7 @@ class App extends Component {
   randomSong = () => {
     const {bpm, tracks} = model.randomSong();
     this.updateTracks(tracks);
-    sequencer.updateBPM(bpm);
+    this.updateBPM(bpm);
   };
 
   share = () => {
