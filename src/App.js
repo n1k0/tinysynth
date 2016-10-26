@@ -107,7 +107,7 @@ function TrackListView({
               })
             }
             <td>
-              {track.beats.some(v => v) > 0 ?
+              {track.beats.some(v => v) ?
                 <a href="" title="Clear track" onClick={event => {
                   event.preventDefault();
                   clearTrack(track.id);
