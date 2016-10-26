@@ -183,10 +183,13 @@ class App extends Component {
     const hash = location.hash.substr(1);
     if (hash.length > 0) {
       try {
-        const rawSong: {bpm: number, tracks: EncodedTrack[]} = JSON.parse(atob(hash));
+        const {bpm, tracks}: {
+          bpm: number, 
+          tracks: EncodedTrack[],
+        } = JSON.parse(atob(hash));
         this.initializeState({
-          ...rawSong,
-          tracks: model.decodeTracks(rawSong.tracks),
+          bpm,
+          tracks: model.decodeTracks(tracks),
         });
       } catch(e) {
         console.warn("Unable to parse hash", hash, e);
