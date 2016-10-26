@@ -49,6 +49,12 @@ function _addTrack(tracks) {
   ];
 }
 
+function _deleteTracks(tracks, id) {
+  return tracks.filter((track: Track) => {
+    return track.id !== id;
+  });
+}
+
 function _toggleTrackBeat(tracks, id, beat) {
   return tracks.map((track: Track) => {
     if (track.id !== id) {
@@ -156,6 +162,7 @@ function TrackListView({
   setTrackVolume,
   updateTrackSample,
   muteTrack,
+  deleteTrack,
 }) {
   return (
     <tbody>{
@@ -185,6 +192,12 @@ function TrackListView({
                 );
               })
             }
+            <td>
+              <a href="" onClick={event => {
+                event.preventDefault();
+                deleteTrack(track.id);
+              }}><Icon name="delete"/></a>
+            </td>
           </tr>
         );
       })
@@ -214,7 +227,7 @@ function Controls({bpm, updateBPM, playing, start, stop, addTrack, share}) {
         <td colSpan="13">
           <Slider min={30} max={240} value={bpm} onChange={onChange} />
         </td>
-        <td colSpan="1">
+        <td colSpan="2">
           <FABButton mini onClick={share} title="Share">
             <Icon name="share" />
           </FABButton>
@@ -275,7 +288,7 @@ class App extends Component {
     }
   }
 
-  initializeState(state) {
+  initializeState(state: {bpm?: number, tracks: Track[]}) {
     this.state = {
       bpm: 120,
       playing: false,
@@ -284,7 +297,7 @@ class App extends Component {
       ...state,
     };
     this.loop = sequencer.create(state.tracks, this.updateCurrentBeat);
-    this.updateBPM(this.state.bpm);
+    sequencer.updateBPM(this.state.bpm);
   }
 
   start = () => {
@@ -309,6 +322,11 @@ class App extends Component {
   addTrack = () => {
     const {tracks} = this.state;
     this.updateTracks(_addTrack(tracks));
+  };
+
+  deleteTrack = (id: number) => {
+    const {tracks} = this.state;
+    this.updateTracks(_deleteTracks(tracks, id));
   };
 
   toggleTrackBeat = (id: number, beat: number) => {
@@ -362,7 +380,8 @@ class App extends Component {
             toggleTrackBeat={this.toggleTrackBeat}
             setTrackVolume={this.setTrackVolume}
             updateTrackSample={this.updateTrackSample}
-            muteTrack={this.muteTrack} />
+            muteTrack={this.muteTrack}
+            deleteTrack={this.deleteTrack} />
           <Controls {...{bpm, updateBPM, playing, start, stop, addTrack, share}} />
         </table>
       </div>
