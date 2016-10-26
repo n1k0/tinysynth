@@ -52,3 +52,7 @@
   border: 0;
   font-size: 1em;
 }
+
+.material-icons.disabled-icon {
+  color: lightgrey;
+}

@@ -30,6 +30,16 @@ export function addTrack(tracks: Track[]) {
   ];
 }
 
+export function clearTrack(tracks: Track[], id: number): Track[] {
+  return tracks.map((track) => {
+    if (track.id !== id) {
+      return track;
+    } else {
+      return {...track, beats: initBeats(16)};
+    }
+  });
+}
+
 export function deleteTracks(tracks: Track[], id: number): Track[] {
   return tracks.filter((track) => track.id !== id);
 }

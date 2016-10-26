@@ -75,6 +75,7 @@ function TrackListView({
   setTrackVolume,
   updateTrackSample,
   muteTrack,
+  clearTrack,
   deleteTrack,
 }) {
   return (
@@ -106,10 +107,16 @@ function TrackListView({
               })
             }
             <td>
-              <a href="" onClick={event => {
+              {track.beats.some(v => v) > 0 ?
+                <a href="" title="Clear track" onClick={event => {
+                  event.preventDefault();
+                  clearTrack(track.id);
+                }}><Icon name="delete"/></a> :
+                <Icon className="disabled-icon" name="delete"/>}
+              <a href="" title="Delete track" onClick={event => {
                 event.preventDefault();
                 deleteTrack(track.id);
-              }}><Icon name="delete"/></a>
+              }}><Icon name="delete_forever"/></a>
             </td>
           </tr>
         );
@@ -186,7 +193,7 @@ class App extends Component {
     if (hash.length > 0) {
       try {
         const {bpm, tracks}: {
-          bpm: number, 
+          bpm: number,
           tracks: EncodedTrack[],
         } = JSON.parse(atob(hash));
         this.initializeState({
@@ -238,6 +245,11 @@ class App extends Component {
   addTrack = () => {
     const {tracks} = this.state;
     this.updateTracks(model.addTrack(tracks));
+  };
+
+  clearTrack = (id: number) => {
+    const {tracks} = this.state;
+    this.updateTracks(model.clearTrack(tracks, id));
   };
 
   deleteTrack = (id: number) => {
@@ -313,6 +325,7 @@ class App extends Component {
             updateTrackSample={this.updateTrackSample}
             muteTrack={this.muteTrack}
             randomSong={this.randomSong}
+            clearTrack={this.clearTrack}
             deleteTrack={this.deleteTrack} />
           <Controls {...{bpm, updateBPM, playing, start, stop, addTrack, share}} />
         </table>
