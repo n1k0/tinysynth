@@ -310,13 +310,15 @@ class App extends Component {
         {shareHash ?
           <ShareDialog hash={shareHash} closeDialog={closeDialog} /> : null}
         <table>
-          <tr>
-            <td colSpan="19">
-              <p style={{textAlign: "right"}}>
-                <Button type="button" colored onClick={randomSong}>I am uninspired, get me some random tracks</Button>
-              </p>
-            </td>
-          </tr>
+          <thead>
+            <tr>
+              <td colSpan="19">
+                <p style={{textAlign: "right"}}>
+                  <Button type="button" colored onClick={randomSong}>I am uninspired, get me some random tracks</Button>
+                </p>
+              </td>
+            </tr>
+          </thead>
           <TrackListView
             tracks={tracks}
             currentBeat={currentBeat}
