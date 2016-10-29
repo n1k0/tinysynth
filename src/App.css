@@ -18,8 +18,9 @@
 .beat {
   background: #eee;
   text-align: center;
-  line-height: 1em;
   border-radius: 2px;
+  width: 40px;
+  padding: 0;
 }
 
 .beat.active {
@@ -34,6 +35,7 @@
 .beat:nth-of-type(7),
 .beat:nth-of-type(11),
 .beat:nth-of-type(15) {
+  width: 36px;
   border-left: 4px solid lightblue;
 }
 
@@ -41,6 +43,39 @@
   display: inline-block;
   width: 40px;
   height: 40px;
+}
+
+.note {
+  background: #eee;
+  text-align: center;
+  line-height: 1em;
+  border-radius: 2px;
+}
+
+.note.active {
+  background: pink;
+}
+
+.note.current {
+  background: #f5f5eb;
+}
+
+.note:nth-of-type(1),
+.note:nth-of-type(5),
+.note:nth-of-type(9),
+.note:nth-of-type(13) {
+  border-left: 4px solid lightblue;
+}
+
+.note > a {
+  display: inline-block;
+  width: 40px;
+  height: 10px;
+}
+
+.track-notes {
+  width: 100%;
+  margin: -2px;
 }
 
 .controls td {

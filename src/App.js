@@ -68,6 +68,41 @@ class SampleSelector extends Component {
   }
 }
 
+function HarmoTrack({currentBeat}) {
+  return (
+    <tr>
+      <th>
+        bass
+      </th>
+      <td className="vol">
+        <Slider min={0} max={1} step={.1} value={1} />
+      </td>
+      <td className="mute">
+        <Switch defaultChecked={true} />
+      </td>
+      <td colSpan="16">
+        <table className="track-notes" style={{padding: 0}}>
+          <tbody>
+          {
+            ["A1", "A2", "A3", "A4"].map((note, i) => {
+              return (
+                <tr key={i}>{
+                  model.initBeats(16).map((x, beat) => {
+                    const noteClass = beat === currentBeat ? "current" : "";
+                    return <td key={beat} className={`note ${noteClass}`}><a href=""></a></td>;
+                  })
+                }</tr>
+              );
+            })
+          }
+          </tbody>
+        </table>
+      </td>
+      <td/>
+    </tr>
+  );
+}
+
 function TrackListView({
   tracks,
   currentBeat,
@@ -79,10 +114,12 @@ function TrackListView({
   deleteTrack,
 }) {
   return (
-    <tbody>{
+    <tbody>
+    <HarmoTrack currentBeat={currentBeat} />
+    {
       tracks.map((track, i) => {
         return (
-          <tr key={i}className="track">
+          <tr key={i} className="track">
             <th>
               <SampleSelector id={track.id} current={track.name} onChange={updateTrackSample} />
             </th>
@@ -312,7 +349,7 @@ class App extends Component {
         <table>
           <thead>
             <tr>
-              <td colSpan="19">
+              <td colSpan="20">
                 <p style={{textAlign: "right"}}>
                   <Button type="button" colored onClick={randomSong}>I am uninspired, get me some random tracks</Button>
                 </p>

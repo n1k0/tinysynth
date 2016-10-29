@@ -11,12 +11,34 @@ const velocities = [
   1, .5, .75, .5,
 ];
 
+const bassNotes = "A1,C2,D2,E2,G2,A2,C3,D3,E3,G3,A3".split(",");
+
 export function create(tracks: Track[], beatNotifier: BeatNotifier): Tone.Sequence {
   const loop = new Tone.Sequence(
     loopProcessor(tracks, beatNotifier),
-    new Array(16).fill(0).map((_, i) => i),
+    new Array(16).fill().map((_, i) => i),
     "16n"
   );
+
+  const bass = new Tone.MonoSynth({
+    volume : -10,
+    envelope : {
+      attack : 0.1,
+      decay : 0.3,
+      release : 2,
+    },
+    filterEnvelope : {
+      attack : 0.001,
+      decay : 0.01,
+      sustain : 0.8,
+      baseFrequency : 200,
+      octaves : 2.6,
+    }
+  }).toMaster();
+
+  // const bassPart = new Tone.Sequence(function(time, note) {
+  //   bass.triggerAttackRelease(note, "32n", time);
+  // }, ["A1", "C2", ["D2", "F2", "E2"], ["G2", "G1"]]).start(0);
 
   Tone.Transport.bpm.value = 120;
   Tone.Transport.start();
