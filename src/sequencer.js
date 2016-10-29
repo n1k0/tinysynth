@@ -38,7 +38,10 @@ export function create(tracks: Track[], beatNotifier: BeatNotifier): Tone.Sequen
 
   // const bassPart = new Tone.Sequence(function(time, note) {
   //   bass.triggerAttackRelease(note, "32n", time);
-  // }, ["A1", "C2", ["D2", "F2", "E2"], ["G2", "G1"]]).start(0);
+  // }, ["A1", "G1", null, "D1",
+  //     "A1", "G1", null, "A1",
+  //     "G1", null, "E1", "F1",
+  //     "A1", "B1", null, "A1"], "16n").start();
 
   Tone.Transport.bpm.value = 120;
   Tone.Transport.start();

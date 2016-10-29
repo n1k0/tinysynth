@@ -1,5 +1,5 @@
 /* @flow */
-import type { Track, EncodedTrack } from "./types";
+import type { Track, Beats, EncodedTrack } from "./types";
 
 import samples from "./samples.json";
 
@@ -13,8 +13,12 @@ export function initTracks(): Track[] {
   ];
 }
 
-export function initBeats(n: number): boolean[] {
-  return new Array(n).fill(false);
+export function initBeats(n: number): Beats {
+  return new Array(n).fill(null);
+}
+
+function defaultBeat(note: ?string) {
+  return {note: note || "A4", vol: 1, dur: "4n"};
 }
 
 export function addTrack(tracks: Track[]) {
@@ -44,14 +48,16 @@ export function deleteTracks(tracks: Track[], id: number): Track[] {
   return tracks.filter((track) => track.id !== id);
 }
 
-export function toggleTrackBeat(tracks: Track[], id: number, beat: number): Track[] {
+export function toggleTrackBeat(tracks: Track[], id: number, index: number): Track[] {
   return tracks.map((track) => {
     if (track.id !== id) {
       return track;
     } else {
       return {
         ...track,
-        beats: track.beats.map((v, i) => i !== beat ? v : !v)
+        beats: track.beats.map((beat, i) => {
+          return i !== index ? beat : beat == null ? defaultBeat() : null;
+        })
       };
     }
   });
@@ -87,11 +93,11 @@ export function updateTrackSample(tracks: Track[], id: number, sample: string): 
   });
 }
 
-function encodeBeats(beats: boolean[]): string {
+function encodeBeats(beats: Beats): string {
   return beats.map(beat => beat ? "1" : "0").join("");
 }
 
-function decodeBeats(encodedBeats: string): boolean[] {
+function decodeBeats(encodedBeats: string): Beats {
   return encodedBeats.split("").map(beat => beat === "1");
 }
 
@@ -115,7 +121,11 @@ export function randomTracks(): Track[] {
       name: samples[Math.floor(Math.random() * samples.length)],
       vol: Math.random(),
       muted: false,
-      beats: initBeats(16).map(_ => Math.random() > .75),
+      beats: initBeats(16).map(_ => Math.random() > .75 ? {
+        note: "A4",
+        vol: 1,
+        dur: "4n",
+      } : null),
     }
   });
 }

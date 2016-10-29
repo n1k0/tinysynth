@@ -17,9 +17,9 @@ import {
   Switch,
 } from "react-mdl";
 
-import "./App.css";
 import "react-mdl/extra/css/material.light_blue-pink.min.css";
 import "react-mdl/extra/material.js";
+import "./App.css";
 
 import * as sequencer from "./sequencer";
 import * as model from "./model";
@@ -68,7 +68,7 @@ class SampleSelector extends Component {
   }
 }
 
-function HarmoTrack({currentBeat}) {
+function HarmoTrack({currentBeat, onBeatClick}) {
   return (
     <tr>
       <th>
@@ -80,18 +80,15 @@ function HarmoTrack({currentBeat}) {
       <td className="mute">
         <Switch defaultChecked={true} />
       </td>
-      <td colSpan="16">
-        <table className="track-notes" style={{padding: 0}}>
+      <td>
+        <table className="track-notes">
           <tbody>
           {
             ["A1", "A2", "A3", "A4"].map((note, i) => {
               return (
-                <tr key={i}>{
-                  model.initBeats(16).map((x, beat) => {
-                    const noteClass = beat === currentBeat ? "current" : "";
-                    return <td key={beat} className={`note ${noteClass}`}><a href=""></a></td>;
-                  })
-                }</tr>
+                <tr key={i}>
+                  <td><Beats type="note" beats={model.initBeats(16)} /></td>
+                </tr>
               );
             })
           }
@@ -100,6 +97,28 @@ function HarmoTrack({currentBeat}) {
       </td>
       <td/>
     </tr>
+  );
+}
+
+function Beats({type, beats, current, onBeatClick}) {
+  return (
+    <table className="track-beats">
+      <tbody>
+        <tr>{
+          beats.map((beat, i) => {
+            const classes = beat != null ? "active" : i === current ? "current" : "";
+            return (
+              <td key={i} className={`beat ${type === "note" ? "note" : ""} ${classes}`}>
+                <a href="" onClick={event => {
+                  event.preventDefault();
+                  onBeatClick(i);
+                }} />
+              </td>
+            );
+          })
+        }</tr>
+      </tbody>
+    </table>
   );
 }
 
@@ -130,21 +149,12 @@ function TrackListView({
             <td className="mute">
               <Switch defaultChecked={!track.muted} onChange={event => muteTrack(track.id)} />
             </td>
-            {
-              track.beats.map((v, beat) => {
-                const beatClass = v ? "active" : beat === currentBeat ? "current" : "";
-                return (
-                  <td key={beat} className={`beat ${beatClass}`}>
-                    <a href="" onClick={(event) => {
-                      event.preventDefault();
-                      toggleTrackBeat(track.id, beat);
-                    }} />
-                  </td>
-                );
-              })
-            }
             <td>
-              {track.beats.some(v => v) ?
+              <Beats beats={track.beats} current={currentBeat}
+                onBeatClick={beatIndex => toggleTrackBeat(track.id, beatIndex)} />
+            </td>
+            <td>
+              {track.beats.some(v => v != null) ?
                 <a href="" title="Clear track" onClick={event => {
                   event.preventDefault();
                   clearTrack(track.id);
@@ -167,24 +177,22 @@ function Controls({bpm, updateBPM, playing, start, stop, addTrack, share}) {
   return (
     <tfoot className="controls">
       <tr>
-        <td style={{textAlign: "right"}}>
+        <th style={{textAlign: "right"}}>
           <FABButton mini colored onClick={addTrack} title="Add new track">
             <Icon name="add" />
           </FABButton>
-        </td>
+        </th>
         <td />
         <td>
           <FABButton mini colored onClick={playing ? stop : start}>
             <Icon name={playing ? "stop" : "play_arrow"} />
           </FABButton>
         </td>
-        <td colSpan="2" className="bpm">
-          BPM <input type="number" value={bpm} onChange={onChange} />
-        </td>
-        <td colSpan="13">
+        <td className="bpm">
+          <div>BPM <input type="number" value={bpm} onChange={onChange} /></div>
           <Slider min={30} max={240} value={bpm} onChange={onChange} />
         </td>
-        <td colSpan="2">
+        <td>
           <FABButton mini onClick={share} title="Share">
             <Icon name="share" />
           </FABButton>
@@ -294,9 +302,9 @@ class App extends Component {
     this.updateTracks(model.deleteTracks(tracks, id));
   };
 
-  toggleTrackBeat = (id: number, beat: number) => {
+  toggleTrackBeat = (id: number, beatIndex: number) => {
     const {tracks} = this.state;
-    this.updateTracks(model.toggleTrackBeat(tracks, id, beat));
+    this.updateTracks(model.toggleTrackBeat(tracks, id, beatIndex));
   };
 
   setTrackVolume = (id: number, vol: number) => {
@@ -346,7 +354,7 @@ class App extends Component {
         <h3>tinysynth</h3>
         {shareHash ?
           <ShareDialog hash={shareHash} closeDialog={closeDialog} /> : null}
-        <table>
+        <table className="tracks">
           <thead>
             <tr>
               <td colSpan="20">

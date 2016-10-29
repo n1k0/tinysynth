@@ -1,5 +1,13 @@
+body {
+  min-height: initial; /* remove some material crap */
+}
+
 .app {
   margin: 1em 0 2em 2em;
+}
+
+.tracks {
+  border-collapse: collapse;
 }
 
 .track th {
@@ -15,67 +23,51 @@
   width: 56px;
 }
 
+.track-beats {
+  width: 100%;
+  border-collapse: collapse;
+}
+
 .beat {
-  background: #eee;
   text-align: center;
   border-radius: 2px;
-  width: 40px;
+  width: 45px;
   padding: 0;
-}
-
-.beat.active {
-  background: pink;
-}
-
-.beat.current {
-  background: #f5f5eb;
-}
-
-.beat:nth-of-type(3),
-.beat:nth-of-type(7),
-.beat:nth-of-type(11),
-.beat:nth-of-type(15) {
-  width: 36px;
-  border-left: 4px solid lightblue;
+  line-height: 0;
 }
 
 .beat > a {
   display: inline-block;
-  width: 40px;
-  height: 40px;
-}
-
-.note {
+  width: 45px;
+  height: 45px;
   background: #eee;
-  text-align: center;
-  line-height: 1em;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
-.note.active {
+.beat.active > a {
   background: pink;
 }
 
-.note.current {
+.beat.current > a {
   background: #f5f5eb;
 }
 
-.note:nth-of-type(1),
-.note:nth-of-type(5),
-.note:nth-of-type(9),
-.note:nth-of-type(13) {
+.beat:nth-of-type(1) > a,
+.beat:nth-of-type(5) > a,
+.beat:nth-of-type(9) > a,
+.beat:nth-of-type(13) > a {
+  width: 41px;
   border-left: 4px solid lightblue;
 }
 
-.note > a {
-  display: inline-block;
-  width: 40px;
-  height: 10px;
+.beat.note > a {
+  height: 14px;
 }
 
 .track-notes {
+  border-collapse: collapse;
   width: 100%;
-  margin: -2px;
+  margin-bottom: 2px;
 }
 
 .controls td {
