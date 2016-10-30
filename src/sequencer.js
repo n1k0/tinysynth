@@ -35,7 +35,7 @@ export function updateBPM(bpm: number): void {
 }
 
 const bass = new Tone.MonoSynth({
-  volume : 2,
+  // volume : .5,
   envelope : {
     attack : .001,
     decay : 0.3,
@@ -65,7 +65,7 @@ function loopProcessor(tracks, beatNotifier: BeatNotifier) {
         try {
           const volume = muted ? 0 : velocities[index] * vol;
           if (type === "bass") {
-            bass.triggerAttackRelease(beats[index].note, "64n", time, volume);
+            bass.triggerAttackRelease(beats[index].note, "16n", time, volume);
           } else {
             drumKit.start(name, time, 0, "1n", 0, volume);
           }

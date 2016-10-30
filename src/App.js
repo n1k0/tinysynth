@@ -275,7 +275,9 @@ class App extends Component {
 
   toggleTrackBeat = (id: number, beatIndex: number, note: string) => {
     const {tracks} = this.state;
-    this.updateTracks(model.toggleTrackBeat(tracks, id, beatIndex, note));
+    const u = model.toggleTrackBeat(tracks, id, beatIndex, note);
+    console.log(u[4].beats);
+    this.updateTracks(u);
   };
 
   setTrackVolume = (id: number, vol: number) => {
