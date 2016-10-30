@@ -26,8 +26,6 @@ import * as model from "./model";
 import samples from "./samples.json";
 
 
-const bassNotes = "A1,C2,D2,E2,G2,A2,C3,D3,E3,G3,A3".split(",");
-
 class SampleSelector extends Component {
   state: {
     open: boolean,
@@ -74,7 +72,7 @@ function Beats({type, beats, currentBeat, onBeatClick}) {
   return (
     <table className="track-beats">
       <tbody>{
-        (type === "bass" ? bassNotes : ["A4"]).map((note, i) => {
+        (type === "bass" ? model.getBassNotes() : ["A4"]).map((note, i) => {
           return (
             <tr key={note}>{
               beats.map((beat, i) => {

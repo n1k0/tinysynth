@@ -4,6 +4,8 @@ import type { Track, Beats, EncodedTrack } from "./types";
 import samples from "./samples.json";
 
 
+const bassNotes = "A1,C2,D2,E2,G2,A2,C3,D3,E3,G3,A3".split(",");
+
 export function initTracks(): Track[] {
   return [
     {id: 1, type: "drum", name: "hihat-reso", vol: .4, muted: false, beats: initBeats(16)},
@@ -20,6 +22,10 @@ export function initBeats(n: number): Beats {
 
 function defaultBeat(note: ?string) {
   return {note: note || "A4", vol: 1, dur: "4n"};
+}
+
+export function getBassNotes(): string[] {
+  return bassNotes;
 }
 
 export function addTrack(tracks: Track[]) {
@@ -117,7 +123,7 @@ export function decodeTracks(encodedTracks: EncodedTrack[]): Track[] {
 
 export function randomTracks(): Track[] {
   const nT = Math.floor(3 + (Math.random() * 10));
-  return new Array(nT).fill().map((_, i) => {
+  const drumTracks = new Array(nT).fill().map((_, i) => {
     return {
       id: i + 1,
       type: "drum",
@@ -131,6 +137,19 @@ export function randomTracks(): Track[] {
       } : null),
     }
   });
+  const bassTrack = {
+    id: nT + 1,
+    type: "bass",
+    name: "bassline",
+    vol: Math.random(),
+    muted: false,
+    beats: initBeats(16).map(_ => Math.random() > .2 ? {
+      note: bassNotes[Math.floor(Math.random() * bassNotes.length)],
+      vol: 1,
+      dur: "4n",
+    } : null),
+  };
+  return [...drumTracks, bassTrack];
 }
 
 export function randomSong(): {bpm: number, tracks: Track[]} {
