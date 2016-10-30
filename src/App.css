@@ -25,12 +25,10 @@ body {
 
 .track-beats {
   width: 100%;
-  border-collapse: collapse;
 }
 
 .beat {
   text-align: center;
-  border-radius: 2px;
   width: 45px;
   padding: 0;
   line-height: 0;
@@ -67,7 +65,6 @@ body {
 .track-notes {
   border-collapse: collapse;
   width: 100%;
-  margin-bottom: 2px;
 }
 
 .controls td {

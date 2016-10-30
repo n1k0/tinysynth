@@ -6,10 +6,11 @@ import samples from "./samples.json";
 
 export function initTracks(): Track[] {
   return [
-    {id: 1, name: "hihat-reso", vol: .4, muted: false, beats: initBeats(16)},
-    {id: 2, name: "hihat-plain", vol: .4, muted: false, beats: initBeats(16)},
-    {id: 3, name: "snare-vinyl01", vol: .9, muted: false, beats: initBeats(16)},
-    {id: 4, name: "kick-electro01", vol: .8, muted: false, beats: initBeats(16)},
+    {id: 1, type: "drum", name: "hihat-reso", vol: .4, muted: false, beats: initBeats(16)},
+    {id: 2, type: "drum", name: "hihat-plain", vol: .4, muted: false, beats: initBeats(16)},
+    {id: 3, type: "drum", name: "snare-vinyl01", vol: .9, muted: false, beats: initBeats(16)},
+    {id: 4, type: "drum", name: "kick-electro01", vol: .8, muted: false, beats: initBeats(16)},
+    {id: 5, type: "bass", name: "bass", vol: .3, muted: false, beats: initBeats(16)},
   ];
 }
 
@@ -48,7 +49,8 @@ export function deleteTracks(tracks: Track[], id: number): Track[] {
   return tracks.filter((track) => track.id !== id);
 }
 
-export function toggleTrackBeat(tracks: Track[], id: number, index: number): Track[] {
+export function toggleTrackBeat(tracks: Track[], id: number, index: number, note: string): Track[] {
+  console.log(note);
   return tracks.map((track) => {
     if (track.id !== id) {
       return track;
@@ -56,7 +58,7 @@ export function toggleTrackBeat(tracks: Track[], id: number, index: number): Tra
       return {
         ...track,
         beats: track.beats.map((beat, i) => {
-          return i !== index ? beat : beat == null ? defaultBeat() : null;
+          return i !== index ? beat : beat == null ? defaultBeat(note) : null;
         })
       };
     }
@@ -118,6 +120,7 @@ export function randomTracks(): Track[] {
   return new Array(nT).fill().map((_, i) => {
     return {
       id: i + 1,
+      type: "drum",
       name: samples[Math.floor(Math.random() * samples.length)],
       vol: Math.random(),
       muted: false,

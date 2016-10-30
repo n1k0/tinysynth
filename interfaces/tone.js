@@ -9,11 +9,24 @@ declare module "tone" {
     callback: (time: number, index: number) => void,
   }
   declare class MultiPlayer {
-    toMaster: () => {start: () => void};
+    toMaster: () => {
+      start: () => void
+    }
+  }
+  declare class MonoSynth {
+    toMaster: () => {
+      triggerAttackRelease: (
+        note: string | number,
+        duration: number | string,
+        time: ?number,
+        velocity: ?number
+      ) => void
+    }
   }
   declare var exports: {
-    Sequence: typeof Sequence,
+    MonoSynth: typeof MonoSynth,
     MultiPlayer: typeof MultiPlayer,
+    Sequence: typeof Sequence,
     Transport: typeof Transport,
   };
 }

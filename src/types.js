@@ -1,8 +1,5 @@
 /* @flow */
 
-export type BeatNotifier =
-  (beat: number) => void;
-
 export type Beat = {
   note: string,
   vol: number,
@@ -11,8 +8,12 @@ export type Beat = {
 
 export type Beats =  Array<?Beat>;
 
+export type BeatNotifier =
+  (beat: number) => void;
+
 export type Track = {
   id: number,
+  type: "bass" | "drum",
   name: string,
   vol: number,
   muted: boolean,
@@ -25,4 +26,9 @@ export type EncodedTrack = {
   vol: number,
   muted: boolean,
   beats: string,
+};
+
+export type Sample = {
+  path: string,
+  poly: boolean,
 };

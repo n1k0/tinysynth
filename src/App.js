@@ -26,6 +26,8 @@ import * as model from "./model";
 import samples from "./samples.json";
 
 
+const bassNotes = "A1,C2,D2,E2,G2,A2,C3,D3,E3,G3,A3".split(",");
+
 class SampleSelector extends Component {
   state: {
     open: boolean,
@@ -68,56 +70,28 @@ class SampleSelector extends Component {
   }
 }
 
-function HarmoTrack({currentBeat, onBeatClick}) {
-  return (
-    <tr>
-      <th>
-        bass
-      </th>
-      <td className="vol">
-        <Slider min={0} max={1} step={.1} value={1} />
-      </td>
-      <td className="mute">
-        <Switch defaultChecked={true} />
-      </td>
-      <td>
-        <table className="track-notes">
-          <tbody>
-          {
-            ["A1", "A2", "A3", "A4"].map((note, i) => {
-              return (
-                <tr key={i}>
-                  <td><Beats type="note" beats={model.initBeats(16)} /></td>
-                </tr>
-              );
-            })
-          }
-          </tbody>
-        </table>
-      </td>
-      <td/>
-    </tr>
-  );
-}
-
-function Beats({type, beats, current, onBeatClick}) {
+function Beats({type, beats, currentBeat, onBeatClick}) {
   return (
     <table className="track-beats">
-      <tbody>
-        <tr>{
-          beats.map((beat, i) => {
-            const classes = beat != null ? "active" : i === current ? "current" : "";
-            return (
-              <td key={i} className={`beat ${type === "note" ? "note" : ""} ${classes}`}>
-                <a href="" onClick={event => {
-                  event.preventDefault();
-                  onBeatClick(i);
-                }} />
-              </td>
-            );
-          })
-        }</tr>
-      </tbody>
+      <tbody>{
+        (type === "bass" ? bassNotes : ["A4"]).map((note, i) => {
+          return (
+            <tr key={note}>{
+              beats.map((beat, i) => {
+                const classes = beat != null && beat.note === note ? "active" : i === currentBeat ? "current" : "";
+                return (
+                  <td key={i} className={`beat ${type === "bass" ? "note" : ""} ${classes}`}>
+                    <a href="" onClick={event => {
+                      event.preventDefault();
+                      onBeatClick(i, note);
+                    }} />
+                  </td>
+                );
+              })
+            }</tr>
+          );
+        })
+      }</tbody>
     </table>
   );
 }
@@ -134,7 +108,6 @@ function TrackListView({
 }) {
   return (
     <tbody>
-    <HarmoTrack currentBeat={currentBeat} />
     {
       tracks.map((track, i) => {
         return (
@@ -150,8 +123,8 @@ function TrackListView({
               <Switch defaultChecked={!track.muted} onChange={event => muteTrack(track.id)} />
             </td>
             <td>
-              <Beats beats={track.beats} current={currentBeat}
-                onBeatClick={beatIndex => toggleTrackBeat(track.id, beatIndex)} />
+              <Beats type={track.type} beats={track.beats} currentBeat={currentBeat}
+                onBeatClick={(beatIndex, note) => toggleTrackBeat(track.id, beatIndex, note)} />
             </td>
             <td>
               {track.beats.some(v => v != null) ?
@@ -302,9 +275,9 @@ class App extends Component {
     this.updateTracks(model.deleteTracks(tracks, id));
   };
 
-  toggleTrackBeat = (id: number, beatIndex: number) => {
+  toggleTrackBeat = (id: number, beatIndex: number, note: string) => {
     const {tracks} = this.state;
-    this.updateTracks(model.toggleTrackBeat(tracks, id, beatIndex));
+    this.updateTracks(model.toggleTrackBeat(tracks, id, beatIndex, note));
   };
 
   setTrackVolume = (id: number, vol: number) => {
