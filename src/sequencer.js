@@ -34,44 +34,34 @@ export function updateBPM(bpm: number): void {
   Tone.Transport.bpm.value = bpm;
 }
 
-const bass = new Tone.MonoSynth({
-  // volume : .5,
-  envelope : {
-    attack : .001,
-    decay : 0.3,
-    release : 2,
-  },
-  filterEnvelope : {
-    attack : 0.001,
-    decay : 0.01,
-    sustain : 0.8,
-    baseFrequency : 200,
-    octaves : 2.6,
-  }
-}).toMaster();
+var reverb = new Tone.Freeverb().toMaster();
+reverb.dampening.value = 20;
+reverb.roomSize.value = .7;
+reverb.wet.value = .75;
+
+const bass = new Tone.MonoSynth({envelope: {attack: .001}}).connect(reverb);
+
+// const bass2 = new Tone.Sampler("./audio/C3.mp3", () => {
+//   bass.triggerAttack(0);
+// }).toMaster();
 
 const drumKit = new Tone.MultiPlayer({
   urls: samples
     .reduce((acc, name) => {
       return {...acc, [name]: `./audio/${name}.wav`};
     }, {})
-}).toMaster();
+}).connect(reverb);
 
 function loopProcessor(tracks, beatNotifier: BeatNotifier) {
   return (time, index) => {
     beatNotifier(index);
     tracks.forEach(({type, name, vol, muted, beats}) => {
       if (beats[index]) {
-        try {
-          const volume = muted ? 0 : velocities[index] * vol;
-          if (type === "bass") {
-            bass.triggerAttackRelease(beats[index].note, "16n", time, volume);
-          } else {
-            drumKit.start(name, time, 0, "1n", 0, volume);
-          }
-        } catch(e) {
-          // We're most likely in a race condition where the new sample hasn't been loaded
-          // just yet; silently ignore, it will resiliently catch up later.
+        const volume = muted ? 0 : velocities[index] * vol;
+        if (type === "bass") {
+          bass.triggerAttackRelease(beats[index].note, "16n", time, volume);
+        } else {
+          drumKit.start(name, time, 0, "1n", 0, volume);
         }
       }
     });

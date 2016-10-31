@@ -23,6 +23,10 @@ body {
   width: 56px;
 }
 
+.beats-cell {
+  padding: 0;
+}
+
 .track-beats {
   width: 100%;
 }

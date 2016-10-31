@@ -9,15 +9,22 @@ import samples from "./samples.json";
 // const notes = "C,Db,D,Eb,E,F,Gb,G,Ab,A,Bb,B".split(",");
 // const bassNotes = [...notes.map(n => n + "2"), ...notes.map(n => n + "3")].reverse();
 const penta = "C,Eb,F,Gb,G,Bb".split(",");
-const bassNotes = [...penta.map(n => n + "1"), ...penta.map(n => n + "2")].reverse();
+const bassNotes = [...penta.map(n => n + "1"), ...penta.map(n => n + "2")].reverse().slice(3);
+
+
 
 export function initTracks(): Track[] {
   return [
-    {id: 1, type: "drum", name: "hihat-reso", vol: .4, muted: false, beats: initBeats(16)},
-    {id: 2, type: "drum", name: "hihat-plain", vol: .4, muted: false, beats: initBeats(16)},
-    {id: 3, type: "drum", name: "snare-vinyl01", vol: .9, muted: false, beats: initBeats(16)},
-    {id: 4, type: "drum", name: "kick-electro01", vol: .8, muted: false, beats: initBeats(16)},
-    {id: 5, type: "bass", name: "bass", vol: .3, muted: false, beats: initBeats(16)},
+    {id: 1, type: "drum", name: "hihat-reso", vol: .4, muted: false,
+     beats: "...X...X...X..XX".split("").map(x => x === "X" ? defaultBeat() : null)},
+    {id: 2, type: "drum", name: "hihat-plain", vol: .4, muted: false,
+     beats: "XXX.XXX.XXX.XX..".split("").map(x => x === "X" ? defaultBeat() : null)},
+    {id: 3, type: "drum", name: "snare-vinyl01", vol: .9, muted: false,
+     beats: "....X.......X...".split("").map(x => x === "X" ? defaultBeat() : null)},
+    {id: 4, type: "drum", name: "kick-electro01", vol: .8, muted: false,
+     beats: "X..X..X.X..XX..X".split("").map(x => x === "X" ? defaultBeat() : null)},
+    {id: 5, type: "bass", name: "bass", vol: .3, muted: false,
+     beats: "C1,,C1,,C2,,Bb1,C2,,F1,,Gb1,,G1,Bb1,C2".split(",").map(x => x !== "" ? defaultBeat(x) : null)},
   ];
 }
 
@@ -131,7 +138,7 @@ export function decodeTracks(encodedTracks: EncodedTrack[]): Track[] {
 }
 
 export function randomTracks(): Track[] {
-  const nT = Math.floor(3 + (Math.random() * 10));
+  const nT = Math.floor(4 + (Math.random() * 5));
   const drumTracks = new Array(nT).fill().map((_, i) => {
     return {
       id: i + 1,

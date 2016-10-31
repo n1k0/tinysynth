@@ -9,6 +9,7 @@ declare module "tone" {
     callback: (time: number, index: number) => void,
   }
   declare class MultiPlayer {
+    connect: (effect: Tone.Effect) => MultiPlayer,
     toMaster: () => {
       start: () => void
     }

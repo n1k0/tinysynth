@@ -118,9 +118,9 @@ function TrackListView({
                 onChange={event => setTrackVolume(track.id, parseFloat(event.target.value))} />
             </td>
             <td className="mute">
-              <Switch defaultChecked={!track.muted} onChange={event => muteTrack(track.id)} />
+              <Switch checked={!track.muted} onChange={event => muteTrack(track.id)} />
             </td>
-            <td>
+            <td className="beats-cell">
               <Beats type={track.type} beats={track.beats} currentBeat={currentBeat}
                 onBeatClick={(beatIndex, note) => toggleTrackBeat(track.id, beatIndex, note)} />
             </td>
@@ -275,9 +275,7 @@ class App extends Component {
 
   toggleTrackBeat = (id: number, beatIndex: number, note: string) => {
     const {tracks} = this.state;
-    const u = model.toggleTrackBeat(tracks, id, beatIndex, note);
-    console.log(u[4].beats);
-    this.updateTracks(u);
+    this.updateTracks(model.toggleTrackBeat(tracks, id, beatIndex, note));
   };
 
   setTrackVolume = (id: number, vol: number) => {
