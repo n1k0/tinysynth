@@ -5,12 +5,12 @@ import samples from "./samples.json";
 import { instruments } from "./instruments";
 
 
-// const meloNotes = "F2,Ab2,C3,Db3,Eb3,F3,Ab3".split(",").reverse();
+const meloNotes = "C2,Db2,Eb2,F2,Ab2,C3,Db3,Eb3,F3,Ab3,F4,Ab4,C4,Db4".split(",").reverse();
 // const meloNotes = "A1,C2,D2,E2,G2,A2,C3,D3,E3,G3,A3".split(",").reverse();
 // const notes = "C,Db,D,Eb,E,F,Gb,G,Ab,A,Bb,B".split(",");
 // const meloNotes = [...notes.map(n => n + "2"), ...notes.map(n => n + "3")].reverse();
-const penta = "C,Eb,F,Gb,G,Bb".split(",");
-const meloNotes = [...penta.map(n => n + "2"), ...penta.map(n => n + "3")].reverse().slice(3);
+// const penta = "C,Eb,F,Gb,G,Bb".split(",");
+// const meloNotes = [...penta.map(n => n + "2"), ...penta.map(n => n + "3")].reverse().slice(3);
 
 
 
@@ -169,7 +169,7 @@ export function randomTracks(): Track[] {
     beats: initBeats(16).map(_ => Math.random() > .5 ? {
       note: meloNotes[Math.floor(Math.random() * meloNotes.length)],
       vol: .5 + (Math.random() / 3),
-      dur: Math.random() > .5 ? "16n" : Math.random() > .5 ? "32n" : "8n",
+      dur: Math.random() > .5 ? "32n" : Math.random() > .5 ? "16n" : "8n",
     } : null),
   };
   return [...drumTracks, meloTrack];
