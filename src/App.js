@@ -48,7 +48,8 @@ class InstrumentSelector extends Component {
 
   onChange = (event) => {
     const {id, onChange} = this.props;
-    onChange(id, event.target.value);
+    const [type, name] = event.target.value.split(":");
+    onChange(id, type, name);
     this.close();
   };
 
@@ -60,12 +61,12 @@ class InstrumentSelector extends Component {
         <select autoFocus value={current} onChange={this.onChange} onBlur={this.close}>
           <optgroup label="Drums">{
             samples.map((sample, i) => {
-              return <option key={i}>{sample}</option>;
+              return <option key={i}>{`drum:${sample}`}</option>;
             })
           }</optgroup>
           <optgroup label="Instruments">{
             Object.keys(instruments).map((instrument, i) => {
-              return <option key={i}>{instrument}</option>;
+              return <option key={i} value={`melo:${instrument}`}>{instrument}</option>;
             })
           }</optgroup>
         </select>
@@ -301,9 +302,9 @@ class App extends Component {
     this.setState({bpm: newBpm});
   };
 
-  updateTrackSample = (id: number, sample: string) => {
+  updateTrackSample = (id: number, type: string, sample: string) => {
     const {tracks} = this.state;
-    this.updateTracks(model.updateTrackSample(tracks, id, sample));
+    this.updateTracks(model.updateTrackSample(tracks, id, type, sample));
   };
 
   closeDialog = () => {

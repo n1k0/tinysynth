@@ -2,6 +2,7 @@
 import type { Track, Beats, EncodedTrack } from "./types";
 
 import samples from "./samples.json";
+import { instruments } from "./instruments";
 
 
 // const meloNotes = "F2,Ab2,C3,Db3,Eb3,F3,Ab3".split(",").reverse();
@@ -23,7 +24,7 @@ export function initTracks(): Track[] {
      beats: "....X.......X...".split("").map(x => x === "X" ? defaultBeat() : null)},
     {id: 4, type: "drum", name: "kick-electro01", vol: .8, muted: false,
      beats: "X..X..X.X..XX..X".split("").map(x => x === "X" ? defaultBeat() : null)},
-    {id: 5, type: "melo", name: "percuboo", vol: .3, muted: false,
+    {id: 5, type: "melo", name: "poly", vol: .5, muted: false,
      beats: "C2,,C2,,C3,,Bb2,C3,,F2,,Gb2,,G2,Bb2,C3".split(",").map(x => x !== "" ? defaultBeat(x, "32n") : null)},
   ];
 }
@@ -107,12 +108,17 @@ export function muteTrack(tracks: Track[], id: number): Track[] {
   });
 }
 
-export function updateTrackSample(tracks: Track[], id: number, sample: string): Track[] {
+export function updateTrackSample(
+  tracks: Track[],
+  id: number,
+  type: "drum" | "melo",
+  name: string
+): Track[] {
   return tracks.map((track) => {
     if (track.id !== id) {
       return track;
     } else {
-      return {...track, name: sample};
+      return {...track, type, name};
     }
   });
 }
@@ -153,10 +159,11 @@ export function randomTracks(): Track[] {
       } : null),
     }
   });
-  const bassTrack = {
+  const meloNames = Object.keys(instruments);
+  const meloTrack = {
     id: nT + 1,
     type: "melo",
-    name: "percuboo",
+    name: meloNames[Math.floor(Math.random() * meloNames.length)],
     vol: .5,
     muted: false,
     beats: initBeats(16).map(_ => Math.random() > .5 ? {
@@ -165,7 +172,7 @@ export function randomTracks(): Track[] {
       dur: Math.random() > .5 ? "16n" : Math.random() > .5 ? "32n" : "8n",
     } : null),
   };
-  return [...drumTracks, bassTrack];
+  return [...drumTracks, meloTrack];
 }
 
 export function randomSong(): {bpm: number, tracks: Track[]} {

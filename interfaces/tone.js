@@ -3,6 +3,17 @@
  * for other purpose.
  */
 declare module "tone" {
+  declare class AudioNode {
+    connect: () => AudioNode,
+    toMaster: () => AudioNode,
+    triggerAttackRelease: (
+      note: string | number,
+      duration: number | string,
+      time: ?number,
+      velocity: ?number
+    ) => void
+  }
+  declare class DuoSynth extends AudioNode {}
   declare class Effect {
     toMaster: () => {}
   }
@@ -18,31 +29,15 @@ declare module "tone" {
       start: () => void
     }
   }
-  declare class MembraneSynth {
+  declare class MembraneSynth extends AudioNode {}
+  declare class MonoSynth extends AudioNode {}
+  declare class PolySynth {
     connect: () => {
-      triggerAttackRelease: (
-        note: string | number,
-        duration: number | string,
-        time: ?number,
-        velocity: ?number
-      ) => void
-    }
-  }
-  declare class MonoSynth {
-    connect: () => {
-      triggerAttackRelease: (
-        note: string | number,
-        duration: number | string,
-        time: ?number,
-        velocity: ?number
-      ) => void
+      set: (name: string, val: any) => void,
     }
   }
   declare class Sampler {
     constructor: (options: {url: string, envelope: Object}) => void,
-    toMaster: () => {
-      triggerAttackRelease: (pitch: number, duration: string, time: number, volume: number) => void,
-    }
   }
   declare class Sequence {
     start: () => void,
@@ -54,11 +49,13 @@ declare module "tone" {
     start: () => void,
   };
   declare var exports: {
+    DuoSynth: typeof DuoSynth,
     Effect: typeof Effect,
     Freeverb: typeof Freeverb,
     MembraneSynth: typeof MembraneSynth,
     MonoSynth: typeof MonoSynth,
     MultiPlayer: typeof MultiPlayer,
+    PolySynth: typeof PolySynth,
     Sampler: typeof Sampler,
     Sequence: typeof Sequence,
     Transport: typeof Transport,

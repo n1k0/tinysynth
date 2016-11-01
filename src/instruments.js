@@ -29,7 +29,39 @@ const percuboo = new Tone.MembraneSynth({
   envelope: {attack: .01},
 }).connect(reverb);
 
+const duo = new Tone.DuoSynth({
+  vibratoAmount: 0.2,
+  harmonicity: 2,
+  voice0: {
+    volume: 2,
+    oscillator: {type: "sawtooth"},
+  },
+  voice1: {
+    volume: 2,
+    oscillator: {type: "sine"},
+  },
+}).connect(reverb);
+
+const duo2 = new Tone.DuoSynth({
+  vibratoAmount: 0.2,
+  harmonicity: 2,
+  voice0: {
+    volume: 2,
+    oscillator: {type: "sawtooth"},
+  },
+  voice1: {
+    volume: 2,
+    oscillator: {type: "square"},
+  },
+}).connect(reverb);
+
+const poly = new Tone.PolySynth(3, Tone.MonoSynth).connect(reverb);
+poly.set("oscillator", {type: "sine"});
+
 export const instruments = {
-  sine,
+  duo,
+  duo2,
   percuboo,
+  poly,
+  sine,
 };
