@@ -13,7 +13,7 @@ export type BeatNotifier =
 
 export type Track = {
   id: number,
-  type: "bass" | "drum",
+  type: "melo" | "drum",
   name: string,
   vol: number,
   muted: boolean,

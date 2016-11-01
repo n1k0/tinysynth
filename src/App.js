@@ -24,9 +24,10 @@ import "./App.css";
 import * as sequencer from "./sequencer";
 import * as model from "./model";
 import samples from "./samples.json";
+import { instruments } from "./instruments";
 
 
-class SampleSelector extends Component {
+class InstrumentSelector extends Component {
   state: {
     open: boolean,
   };
@@ -56,11 +57,18 @@ class SampleSelector extends Component {
     const {open} = this.state;
     if (open) {
       return (
-        <select autoFocus value={current} onChange={this.onChange} onBlur={this.close}>{
-          samples.map((sample, i) => {
-            return <option key={i}>{sample}</option>;
-          })
-        }</select>
+        <select autoFocus value={current} onChange={this.onChange} onBlur={this.close}>
+          <optgroup label="Drums">{
+            samples.map((sample, i) => {
+              return <option key={i}>{sample}</option>;
+            })
+          }</optgroup>
+          <optgroup label="Instruments">{
+            Object.keys(instruments).map((instrument, i) => {
+              return <option key={i}>{instrument}</option>;
+            })
+          }</optgroup>
+        </select>
       );
     } else {
       return <a href="" onClick={this.open}>{current}</a>;
@@ -72,13 +80,13 @@ function Beats({type, beats, currentBeat, onBeatClick}) {
   return (
     <table className="track-beats">
       <tbody>{
-        (type === "bass" ? model.getBassNotes() : ["A4"]).map((note, i) => {
+        (type === "melo" ? model.getMeloNotes() : ["A4"]).map((note, i) => {
           return (
             <tr key={note}>{
               beats.map((beat, i) => {
                 const classes = beat != null && beat.note === note ? "active" : i === currentBeat ? "current" : "";
                 return (
-                  <td key={i} className={`beat ${type === "bass" ? "note" : ""} ${classes}`}>
+                  <td key={i} className={`beat ${type === "melo" ? "melo" : ""} ${classes}`}>
                     <a href="" onClick={event => {
                       event.preventDefault();
                       onBeatClick(i, note);
@@ -111,7 +119,7 @@ function TrackListView({
         return (
           <tr key={i} className="track">
             <th>
-              <SampleSelector id={track.id} current={track.name} onChange={updateTrackSample} />
+              <InstrumentSelector id={track.id} current={track.name} onChange={updateTrackSample} />
             </th>
             <td className="vol">
               <Slider min={0} max={1} step={.1} value={track.vol}

@@ -62,7 +62,7 @@ body {
   border-left: 4px solid lightblue;
 }
 
-.beat.note > a {
+.beat.melo > a {
   height: 14px;
 }
 
