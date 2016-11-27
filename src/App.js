@@ -138,12 +138,12 @@ function TrackListView({
                 <a href="" title="Clear track" onClick={event => {
                   event.preventDefault();
                   clearTrack(track.id);
-                }}><Icon name="delete"/></a> :
-                <Icon className="disabled-icon" name="delete"/>}
+                }}><Icon name="not_interested"/></a> :
+                <Icon className="disabled-icon" name="not_interested"/>}
               <a href="" title="Delete track" onClick={event => {
                 event.preventDefault();
                 deleteTrack(track.id);
-              }}><Icon name="delete_forever"/></a>
+              }}><Icon name="cancel"/></a>
             </td>
           </tr>
         );
